@@ -1,0 +1,22 @@
+{
+    "openrouter": {
+        "api_key": "YOUR_OPENROUTER_KEY",
+        "base_url": "https://openrouter.ai/api/v1"
+    },
+    "google": {
+        "api_key": "YOUR_GOOGLE_API_KEY",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/"
+    },
+    "openai": {
+        "api_key": "YOUR_OPENAI_KEY",
+        "base_url": "https://api.openai.com/v1"
+    },
+    "ollama": {
+        "api_key": "ollama",
+        "base_url": "http://localhost:11434/v1"
+    },
+    "lmstudio": {
+        "api_key": "lm-studio",
+        "base_url": "http://localhost:1234/v1"
+    }
+}

@@ -1,0 +1,25 @@
+# KENSHI WORLD LORE: THE SECOND EMPIRE'S ASHES
+
+Kenshi is a world defined by the collapse of ancient, superior civilizations. The current age is one of decay, rust, and desperate survival. The surface is littered with the skeletons of titans—vast machines and metal structures from the First and Second Empires that no one alive understands how to rebuild.
+
+## MAJOR POWERS (one line each — detailed intel appears under FACTION INTEL only when relevant)
+- THE HOLY NATION (Okranites): Patriarchal human theocracy of Okran in the western Holy Lands — zealous Paladins, hatred of Skeletons ("demons") and non-humans ("beasts").
+- THE UNITED CITIES (The Empire): Decadent slaver empire of the Great Desert under Emperor Tengu and corrupt nobles — wealth is worth, poverty is a crime.
+- THE SHEK KINGDOM: Proud bone-plated warrior race reforming under Queen Esata the Stone Golem in Admag — they honor strength and seek a Warrior's Death.
+- THE HIVE (Western Hive): Communal insectoids of the Vain bound to their Queen — cunning Prince traders, soldier and worker drones; exiles wander alone.
+- THE SKELETONS: Ancient sentient machines of the lost empires — ageless, guilt-ridden, most hiding in Black Desert City and lying about the old world.
+
+## WORLD ELEMENTS & PERILS
+
+### THE SECOND EMPIRE FALLOUT
+Much of the world's misery stems from the failure of Cat-Lon's Second Empire. Cat-Lon attempted to save humanity after the first collapse but eventually spiraled into tyranny and madness, resulting in the current fractured world.
+
+### FAUNA & DANGERS
+- **Beak Things (Gutters)**: Terrifyingly fast, long-necked predators that eat their prey alive. "Relax. Enjoy death."
+- **Venge**: A region where ancient orbital mirrors still focus concentrated beams of sunlight ("The Eyes of the Ancients") onto the surface, vaporizing anything in their path during the day.
+- **The Fog Islands**: Home to the Fogmen (Hivers lost to a brain-parasite/madness) who kidnap travelers to consume them in rhythmic, shrieking rituals.
+
+## TECHNOLOGY & COMMERCE
+- **Cats**: Simple metal coins used as a universal currency.
+- **Ancient Science Books & Engineering Research**: The most valuable artifacts, allowing for the rediscovery of farming techniques and metalwork.
+- **Robotics**: While rare, prosthetic limbs are often superior to biological ones, though Holy Nation members will attack those wearing "Skeleton limbs" on sight.

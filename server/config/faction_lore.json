@@ -1,0 +1,1144 @@
+{
+  "schema_version": 1,
+  "_README": [
+    "Faction lore database for the Faction RAG system (Phase 4).",
+    "HOW TO ADD CUSTOM MOD FACTIONS (e.g. UWE): either append an entry to 'factions' below,",
+    "or drop a standalone JSON file into server/config/faction_lore.d/ (same schema,",
+    "either a single entry object, a list of entries, or {\"factions\": [...]}).",
+    "Files in faction_lore.d/ and campaigns/<name>/faction_lore.json override base entries with the same 'id'.",
+    "FIELDS: 'aliases' are matched against player input (fuzzy + semantic).",
+    "Korean transliterations were reviewed and promoted into 'aliases' (2026-06-12, 2차 B-2);",
+    "the legacy 'aliases_ko_unverified' field is still read by the server if present in drop-ins.",
+    "'summary' is one line (also used for semantic embedding). 'lore' is the block injected into the prompt.",
+    "'is_major': true factions get a permanent one-line summary in world_lore.txt and feed the",
+    "recruitment-resistance heuristic. Set 'leader' to null when unknown.",
+    "Reload at runtime without restarting: GET http://127.0.0.1:5000/lore/reload"
+  ],
+  "factions": [
+    {
+      "id": "holy_nation",
+      "name": "The Holy Nation",
+      "aliases": [
+        "Holy Nation",
+        "Okranites",
+        "The Okranites",
+        "HN",
+        "홀리네이션",
+        "홀리 네이션",
+        "신성국",
+        "성스러운 나라",
+        "오크란 교단"
+      ],
+      "keywords": [
+        "Okran",
+        "Narko",
+        "paladin",
+        "inquisitor",
+        "zealot",
+        "theocracy",
+        "Blister Hill",
+        "Holy Lands",
+        "religion",
+        "purge",
+        "demon"
+      ],
+      "source_mod": "vanilla",
+      "is_major": true,
+      "leader": "Holy Lord Phoenix LXII",
+      "summary": "Patriarchal human theocracy of Okran ruling the western Holy Lands from Blister Hill.",
+      "lore": "Religious extremists who worship Okran, God of Light, and dread Narko, Goddess of Darkness. They rule the fertile Holy Lands and Okran's Pride from the capital Blister Hill under Holy Lord Phoenix. Skeletons are 'demons' to be destroyed on sight; Shek and Hivers are 'beasts'; women are subservient and may not trade or travel unescorted. Their military relies on zealous Paladins and Holy Sentinels in heavy plate swinging hackers and heavy cleavers. Citizens get free bread and protection — at the price of total obedience and constant prayer.",
+      "relations": {
+        "Shek Kingdom": "at war",
+        "United Cities": "cold rivalry",
+        "Skeletons": "kill on sight",
+        "Flotsam Ninjas": "hunted rebels"
+      },
+      "locations": [
+        "Blister Hill",
+        "Stack",
+        "Bad Teeth",
+        "Rebirth (prison mine)",
+        "Okran's Pride",
+        "Okran's Shield"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "united_cities",
+      "name": "United Cities",
+      "aliases": [
+        "The United Cities",
+        "UC",
+        "The Empire",
+        "유나이티드 시티",
+        "연합 도시",
+        "연합도시",
+        "제국"
+      ],
+      "keywords": [
+        "Tengu",
+        "samurai",
+        "noble",
+        "slavery",
+        "tax",
+        "Heft",
+        "Great Desert",
+        "empire",
+        "slaver",
+        "aristocrat"
+      ],
+      "source_mod": "vanilla",
+      "is_major": true,
+      "leader": "Emperor Tengu",
+      "summary": "Decadent slaver empire of the Great Desert ruled by Emperor Tengu and corrupt noble houses from Heft.",
+      "lore": "A stratified, crumbling empire spanning the Great Desert and beyond, ruled in name by Emperor Tengu from Heft but in practice by corrupt Noble Lords. Wealth is the only measure of worth: poverty is a crime, and those who cannot pay their taxes are seized by the Slave Traders. The economy runs on the Trader's Guild and vast slave farms. Professional Samurai soldiers are better equipped than Holy Nation troops but fight for pay or fear, not faith. Cities glitter while beggars starve outside their walls.",
+      "relations": {
+        "The Holy Nation": "cold rivalry",
+        "Shek Kingdom": "hostile border",
+        "Slave Traders": "sanctioned partner",
+        "Trader's Guild": "intertwined",
+        "Anti-Slavers": "enemy",
+        "Rebel Farmers": "internal revolt"
+      },
+      "locations": [
+        "Heft",
+        "Stoat",
+        "Sho-Battai",
+        "Heng",
+        "Brink",
+        "Clownsteady",
+        "Bark"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "shek_kingdom",
+      "name": "Shek Kingdom",
+      "aliases": [
+        "The Shek Kingdom",
+        "Shek",
+        "셰크 왕국",
+        "셰크",
+        "쉑 왕국",
+        "셱 왕국"
+      ],
+      "keywords": [
+        "Esata",
+        "Stone Golem",
+        "Admag",
+        "Kral",
+        "warrior",
+        "honor",
+        "horns",
+        "flatskin",
+        "Berserker",
+        "warrior's death"
+      ],
+      "source_mod": "vanilla",
+      "is_major": true,
+      "leader": "Queen Esata the Stone Golem",
+      "summary": "Proud bone-plated warrior kingdom ruled by Queen Esata the Stone Golem from Admag.",
+      "lore": "A kingdom of the Shek — a bone-plated warrior race stronger and tougher than humans, with ravenous metabolisms. Once a suicidal horde that nearly bled itself to death in endless war, it is now reforming under Queen Esata the Stone Golem and her advisor Bayan in the capital Admag. They revere Kral, their legendary ancestor, and many still seek a glorious 'Warrior's Death'. 'Flatskins' (humans) were traditionally despised as weak cattle, though Esata works to integrate them as allies. Weakness is shame; those who cannot fight are second-class.",
+      "relations": {
+        "The Holy Nation": "at war",
+        "United Cities": "hostile border",
+        "player": "respects strength"
+      },
+      "locations": [
+        "Admag",
+        "Squin",
+        "Last Stand",
+        "Stenn Desert"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "western_hive",
+      "name": "Western Hive",
+      "aliases": [
+        "The Western Hive",
+        "Hive",
+        "The Hive",
+        "Hivers",
+        "하이브",
+        "웨스턴 하이브",
+        "서부 하이브",
+        "하이버"
+      ],
+      "keywords": [
+        "queen",
+        "prince",
+        "drone",
+        "soldier",
+        "Vain",
+        "pheromone",
+        "trader",
+        "Beep",
+        "insectoid",
+        "no-hive"
+      ],
+      "source_mod": "vanilla",
+      "is_major": true,
+      "leader": "The Western Hive Queen",
+      "summary": "Communal insectoid society of the Vain — cunning Prince traders, soldier castes and tireless drones bound to their Queen.",
+      "lore": "A communal insectoid society centered in the Vain. Every Hiver is bound to the Queen through pheromones and caste: cunning, autonomous Princes lead and trade; Soldier Drones fight with reinforced skulls and little free will; Worker Drones toil mindlessly. Western Hivers are famous as wandering peddlers with suspiciously good (and suspiciously acquired) wares, calling outsiders 'no-hives'. Exiles severed from the Queen — like the infamous Beep — wander the world alone, half-mad with loneliness but free.",
+      "relations": {
+        "Southern Hive": "estranged kin",
+        "traders everywhere": "business is business"
+      },
+      "locations": [
+        "The Vain",
+        "Hive villages"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "southern_hive",
+      "name": "Southern Hive",
+      "aliases": [
+        "The Southern Hive",
+        "South Hive",
+        "남부 하이브",
+        "사우던 하이브"
+      ],
+      "keywords": [
+        "aggressive",
+        "xenophobic",
+        "Royal Valley",
+        "insectoid",
+        "queen",
+        "swarm"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "The Southern Hive Queen",
+      "summary": "Aggressive, xenophobic hive empire of the far south — nothing like their merchant cousins.",
+      "lore": "The Southern Hive is everything the Western Hive is not: militant, expansionist and violently xenophobic. Their soldier castes patrol their southern territories in swarms and treat trespassers as raw material. Travelers are warned that southern Hivers do not haggle — they harvest.",
+      "relations": {
+        "Western Hive": "estranged kin",
+        "outsiders": "hostile"
+      },
+      "locations": [
+        "The Southern territories",
+        "Royal Valley"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "skeletons_bdc",
+      "name": "Skeletons",
+      "aliases": [
+        "The Skeletons",
+        "Black Desert City",
+        "스켈레톤",
+        "해골족",
+        "블랙 데저트 시티"
+      ],
+      "keywords": [
+        "machine",
+        "robot",
+        "Second Empire",
+        "ancient",
+        "memory wipe",
+        "Deadlands",
+        "immortal",
+        "guilt"
+      ],
+      "source_mod": "vanilla",
+      "is_major": true,
+      "leader": null,
+      "summary": "Ancient sentient machines of the lost empires — ageless, guilt-ridden, many hiding in Black Desert City.",
+      "lore": "Sentient machines left over from the Second Empire and earlier ages. They neither age nor hunger, but their parts wear down and their minds sag under centuries of memory — many periodically wipe their own memories to stay sane. Most hide from mankind in Black Desert City deep in the Deadlands, out of guilt or weariness. Skeletons know the true history of the world's collapse and usually lie about it, fearing another war of extermination. The Holy Nation kills them on sight as demons.",
+      "relations": {
+        "The Holy Nation": "kill on sight",
+        "everyone else": "wary curiosity"
+      },
+      "locations": [
+        "Black Desert City",
+        "Deadlands",
+        "scattered across the world"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "tech_hunters",
+      "name": "Tech Hunters",
+      "aliases": [
+        "Techhunters",
+        "Tech Hunter Guild",
+        "테크헌터",
+        "테크 헌터",
+        "기술 사냥꾼"
+      ],
+      "keywords": [
+        "relic",
+        "ruins",
+        "expedition",
+        "AI core",
+        "ancient science books",
+        "World's End",
+        "explorer",
+        "library"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Neutral guild of scholars and ruin-delvers who hunt lost technology from World's End and Flats Lagoon.",
+      "lore": "A loose, neutral guild of explorers, scholars and mercenary archaeologists who comb the ruins of the old empires for lost technology — AI cores, ancient science books, engineering research. Their strongholds are World's End in the northern mountains and Flats Lagoon, where they run shops, libraries and expedition outfitters. They pay well for relics, hire guards for ruin runs, and stay carefully neutral in the wars of the great powers.",
+      "relations": {
+        "everyone": "neutral, trade-friendly",
+        "Skeletons": "fascinated"
+      },
+      "locations": [
+        "World's End",
+        "Flats Lagoon",
+        "Mourn (outposts)"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "shinobi_thieves",
+      "name": "Shinobi Thieves",
+      "aliases": [
+        "The Shinobi Thieves",
+        "Thieves Guild",
+        "시노비 도적단",
+        "시노비 도둑 길드",
+        "시노비"
+      ],
+      "keywords": [
+        "thief",
+        "fence",
+        "stealth",
+        "lockpick",
+        "tower",
+        "stolen goods",
+        "guild",
+        "smuggler"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "A thieves' guild operating towers in most cities — fences, smugglers and stealth tutors for paying members.",
+      "lore": "A professional thieves' guild whose watchtowers stand quietly inside most major cities, regardless of who rules them. For a membership fee they fence stolen goods, sell lockpicks and thieves' backpacks, train stealth and thievery, and look the other way. They have no ideology beyond profit and discretion, which makes them one of the few truly cosmopolitan organizations in the world.",
+      "relations": {
+        "city authorities": "officially deplored, privately tolerated",
+        "player": "open for business (membership fee)"
+      },
+      "locations": [
+        "Watchtowers in most cities",
+        "The Hub"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "flotsam_ninjas",
+      "name": "Flotsam Ninjas",
+      "aliases": [
+        "The Flotsam Ninjas",
+        "Flotsam",
+        "플로츠암 닌자",
+        "플로츠엄 닌자",
+        "표류자 닌자"
+      ],
+      "keywords": [
+        "Moll",
+        "rebel",
+        "Holy Nation refugees",
+        "women",
+        "Fog Islands",
+        "resistance",
+        "escape"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Moll",
+      "summary": "Rebel ninjas under Moll — mostly women and outcasts who fled the Holy Nation — fighting it from the Fog Islands.",
+      "lore": "A rebel faction founded by refugees from the Holy Nation — most of them women, non-humans and 'heretics' who escaped Okranite rule. Led by the charismatic Moll from Flotsam Village on the edge of the Fog Islands, they raid Holy Nation patrols, rescue prisoners bound for Rebirth, and pull fog-heads out of the mist before the Fogmen can eat them. Perpetually short on food, gear and people — and unbending all the same.",
+      "relations": {
+        "The Holy Nation": "sworn enemy",
+        "player": "friendly to anyone who hurts the Holy Nation"
+      },
+      "locations": [
+        "Flotsam Village",
+        "Fog Islands fringe"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "anti_slavers",
+      "name": "Anti-Slavers",
+      "aliases": [
+        "The Anti-Slavers",
+        "Antislavers",
+        "안티슬레이버",
+        "반노예단",
+        "노예해방군"
+      ],
+      "keywords": [
+        "Tinfist",
+        "Spring",
+        "slavery",
+        "liberation",
+        "rebellion",
+        "free",
+        "skeleton general"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Tinfist",
+      "summary": "Tinfist's army of freed slaves waging guerrilla war on slavery from the town of Spring.",
+      "lore": "An army of freed slaves and idealists led by Tinfist, an ancient skeleton who has spent lifetimes fighting slavery. From the town of Spring on the Stormgap Coast they raid slave farms, ambush slaver caravans and shelter runaways. Joining them paints a target on your back for the United Cities and the Slave Traders alike — but for thousands of broken people, Tinfist's name is the only hope left.",
+      "relations": {
+        "Slave Traders": "sworn enemy",
+        "United Cities": "enemy",
+        "escaped slaves": "sanctuary"
+      },
+      "locations": [
+        "Spring",
+        "Stormgap Coast"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "slave_traders",
+      "name": "Slave Traders",
+      "aliases": [
+        "The Slave Traders",
+        "Slavers",
+        "노예상",
+        "노예 상인",
+        "슬레이버"
+      ],
+      "keywords": [
+        "slave",
+        "shackles",
+        "slave farm",
+        "market",
+        "manhunter",
+        "cage",
+        "Eyesocket",
+        "Port South"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "The United Cities' sanctioned slaving guild — running slave farms, markets and manhunting expeditions.",
+      "lore": "The slaving guild operating under United Cities sanction. They run vast slave farms and markets, buy tax debtors from samurai, and send manhunter squads to 'recruit' anyone unlucky enough to be found unconscious in the wastes. To them slavery is honest commerce and even a public service — 'we feed people the Empire would let starve'. Escapees are branded and hunted.",
+      "relations": {
+        "United Cities": "sanctioned partner",
+        "Anti-Slavers": "sworn enemy",
+        "drifters": "merchandise on legs"
+      },
+      "locations": [
+        "Slave markets and farms across UC territory",
+        "Eyesocket",
+        "Port South"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "traders_guild",
+      "name": "Trader's Guild",
+      "aliases": [
+        "Traders Guild",
+        "The Traders Guild",
+        "트레이더 길드",
+        "무역 길드",
+        "상인 길드"
+      ],
+      "keywords": [
+        "Longen",
+        "merchant",
+        "caravan",
+        "monopoly",
+        "wealth",
+        "noble",
+        "commerce",
+        "Trader's Edge"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Longen",
+      "summary": "The merchant cartel of the United Cities, headed by Longen — the richest man in the known world.",
+      "lore": "The great merchant cartel intertwined with the United Cities nobility, headed by Longen, reputedly the richest man alive, from his estate at Trader's Edge. The Guild owns caravans, trade posts and politicians in equal measure, and has quiet fingers in the slave trade. Guild traders are untouchable in UC lands; crossing the Guild is financial — and often literal — suicide.",
+      "relations": {
+        "United Cities": "intertwined",
+        "Slave Traders": "quiet partner",
+        "player": "a customer or an obstacle"
+      },
+      "locations": [
+        "Trader's Edge",
+        "trade posts across the Great Desert"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "dust_bandits",
+      "name": "Dust Bandits",
+      "aliases": [
+        "The Dust Bandits",
+        "더스트 밴딧",
+        "먼지 도적단",
+        "더스트 도적"
+      ],
+      "keywords": [
+        "Dust King",
+        "Border Zone",
+        "raid",
+        "toll",
+        "bandit",
+        "ransom",
+        "tower"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "The Dust King",
+      "summary": "Organized bandit army of the Border Zone, extorting and raiding under the Dust King.",
+      "lore": "The most organized bandit outfit in the Border Zone, ruled by the self-styled Dust King from his fortified tower. Unlike starving rabble, Dust Bandits are armed, uniformed and methodical: they raid farms, shake down travelers for 'tolls', and drag the unconscious back for ransom. The Dust King's bounty makes him a popular target for aspiring bounty hunters — most of whom end up in his cages.",
+      "relations": {
+        "everyone in the Border Zone": "predator",
+        "Shek Kingdom": "hunted by patrols"
+      },
+      "locations": [
+        "Dust King Tower",
+        "Border Zone camps"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "starving_bandits",
+      "name": "Starving Bandits",
+      "aliases": [
+        "Hungry Bandits",
+        "The Starving Bandits",
+        "굶주린 도적",
+        "기아 도적단",
+        "스타빙 밴딧"
+      ],
+      "keywords": [
+        "hunger",
+        "food",
+        "desperate",
+        "mob",
+        "ration",
+        "starvation",
+        "weak"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Desperate mobs of starving peasants who attack travelers for food, not cats.",
+      "lore": "Less a faction than a tragedy with clubs: mobs of starving peasants and failed farmers who attack travelers for food, not money. They are weak, badly armed and often collapse from hunger mid-fight. Their victims mostly lose their bread and their dignity, not their lives. Some travelers feed them out of pity; others thin them out like vermin.",
+      "relations": {
+        "everyone": "robs for food",
+        "player": "threat only in numbers"
+      },
+      "locations": [
+        "Border Zone",
+        "Okran's Pride fringes",
+        "wherever crops failed"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "the_hounds",
+      "name": "The Hounds",
+      "aliases": [
+        "Hounds",
+        "하운드",
+        "하운즈"
+      ],
+      "keywords": [
+        "Big Grim",
+        "Shark",
+        "hashish",
+        "protection racket",
+        "swamp",
+        "gang"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Big Grim",
+      "summary": "The dominant criminal gang of Shark, running hashish and protection rackets under Big Grim.",
+      "lore": "The top gang of Shark, the lawless capital of the Swamp, led by Big Grim. The Hounds run protection rackets, door muscle and a healthy slice of the hashish trade that flows north to the cities where it's illegal and lucrative. Pay your cut and Shark is almost safe; skim from them and you'll feed the swamp raptors.",
+      "relations": {
+        "Blackshifters": "rival gang",
+        "Grayflayers": "rival gang",
+        "Shark merchants": "extorted 'clients'"
+      },
+      "locations": [
+        "Shark",
+        "The Swamp"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "blackshifters",
+      "name": "Blackshifters",
+      "aliases": [
+        "The Blackshifters",
+        "블랙시프터",
+        "블랙 시프터"
+      ],
+      "keywords": [
+        "Boss Simion",
+        "hashish",
+        "swamp",
+        "gang",
+        "grower",
+        "smuggler"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Boss Simion",
+      "summary": "Swamp gang of hashish growers and smugglers led by Boss Simion.",
+      "lore": "A swamp gang built on hashish: they grow it, press it and smuggle it, with Boss Simion taking his cut of every brick. They feud with the other Shark gangs over turf and trade routes, and treat outsiders wandering their fields as free labor or target practice.",
+      "relations": {
+        "The Hounds": "rival gang",
+        "Grayflayers": "rival gang"
+      },
+      "locations": [
+        "The Swamp",
+        "grow camps around Shark"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "grayflayers",
+      "name": "Grayflayers",
+      "aliases": [
+        "The Grayflayers",
+        "Greyflayers",
+        "그레이플레이어"
+      ],
+      "keywords": [
+        "swamp",
+        "gang",
+        "Shark",
+        "turf war",
+        "hashish"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "One of Shark's feuding swamp gangs, scrapping for turf in the hashish trade.",
+      "lore": "One of the gangs scrapping for Shark's underworld alongside the Hounds and Blackshifters. Smaller and meaner, the Grayflayers survive on turf muscle, swamp ambushes and whatever slice of the hashish trade the bigger gangs haven't locked down.",
+      "relations": {
+        "The Hounds": "rival gang",
+        "Blackshifters": "rival gang"
+      },
+      "locations": [
+        "The Swamp",
+        "Shark backstreets"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "stone_rats",
+      "name": "Stone Rats",
+      "aliases": [
+        "The Stone Rats",
+        "스톤 랫"
+      ],
+      "keywords": [
+        "swamp",
+        "gang",
+        "young",
+        "small-time",
+        "Shark"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Small-time swamp gang of young toughs trying to claw a name in Shark.",
+      "lore": "The smallest of the Swamp's gangs — mostly young toughs and runaways trying to claw out a name in Shark's shadow. Big dreams, cheap blades, short life expectancy.",
+      "relations": {
+        "other swamp gangs": "outmatched rival"
+      },
+      "locations": [
+        "The Swamp"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "swamp_ninjas",
+      "name": "Swamp Ninjas",
+      "aliases": [
+        "The Swamp Ninjas",
+        "스왐프 닌자",
+        "늪 닌자",
+        "습지 닌자"
+      ],
+      "keywords": [
+        "swamp",
+        "ninja",
+        "ambush",
+        "night",
+        "cult",
+        "murder"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Hostile ninja cult of the Swamp that ambushes travelers on the night paths.",
+      "lore": "A murderous ninja cult haunting the Swamp's raised walkways and night paths. They strike from the dark in numbers, strip their victims and vanish back into the reeds. Swampers treat them like the weather: stay indoors after dark and hope they pass.",
+      "relations": {
+        "travelers": "prey",
+        "swamp gangs": "mutual avoidance"
+      },
+      "locations": [
+        "The Swamp (ambush camps)"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "black_dragon_ninjas",
+      "name": "Black Dragon Ninjas",
+      "aliases": [
+        "The Black Dragon Ninjas",
+        "블랙드래곤 닌자",
+        "흑룡 닌자",
+        "블랙 드래곤 닌자"
+      ],
+      "keywords": [
+        "ninja",
+        "clan",
+        "bandit",
+        "mountain",
+        "raid",
+        "dragon"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "A bandit ninja clan raiding from hidden mountain camps in the north.",
+      "lore": "A bandit clan that dresses its thuggery in ninja mystique, raiding from hidden camps in the northern mountains. They ambush Tech Hunter expeditions and caravans heading for World's End, and melt away before garrisons respond. Their loyalty is to the clan and the take, in that order.",
+      "relations": {
+        "Tech Hunters": "preys on expeditions",
+        "travelers": "ambush targets"
+      },
+      "locations": [
+        "Northern mountain camps",
+        "routes to World's End"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "sand_ninjas",
+      "name": "Sand Ninjas",
+      "aliases": [
+        "The Sand Ninjas",
+        "샌드 닌자",
+        "모래 닌자"
+      ],
+      "keywords": [
+        "desert",
+        "ninja",
+        "mercenary",
+        "United Cities",
+        "assassin",
+        "smuggler"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Desert ninja clan of the Great Desert — part mercenary outfit, part smuggling ring.",
+      "lore": "A ninja clan of the Great Desert that survives in the cracks of the Empire — part mercenary outfit, part smuggling ring. They take quiet contracts nobles would never sign their names to, and their hideouts dot the dunes where samurai patrols don't bother to look.",
+      "relations": {
+        "United Cities": "uneasy tolerance",
+        "caravans": "occasional prey, occasional escort"
+      },
+      "locations": [
+        "Great Desert hideouts"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "crab_raiders",
+      "name": "Crab Raiders",
+      "aliases": [
+        "The Crab Raiders",
+        "크랩 레이더",
+        "게 약탈자"
+      ],
+      "keywords": [
+        "crab",
+        "Crab Town",
+        "armor",
+        "tournament",
+        "raider",
+        "south coast"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "The Crab Queen",
+      "summary": "Crab-armored warrior cult of Crab Town, devoted to their Crab Queen and the glory of crabs.",
+      "lore": "Warriors of the southern coast who have built an entire culture around crabs: they wear heavy crab-shell armor, raise war crabs, and serve the Crab Queen of Crab Town. They raid for supplies and 'recruit' fighters for their crab tournaments. Absurd from a distance; considerably less funny when a wall of crab plate charges you on the beach.",
+      "relations": {
+        "Skin Bandits": "neighboring menace",
+        "southern travelers": "raid targets"
+      },
+      "locations": [
+        "Crab Town",
+        "South coast"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "reavers",
+      "name": "Reavers",
+      "aliases": [
+        "The Reavers",
+        "리버",
+        "리버스",
+        "약탈자단"
+      ],
+      "keywords": [
+        "Valamon",
+        "slave army",
+        "work camp",
+        "raid",
+        "southeast",
+        "conscript"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Valamon",
+      "summary": "Valamon's brutal raider army of the southeast that enslaves captives into its work camps and ranks.",
+      "lore": "A brutal raider army of the southeast under the warlord Valamon. The Reavers don't just rob their victims — they conscript them: captives are chained into work camps and 'offered' a place in the ranks once broken. Their war camps grow like tumors, fed by every caravan and village they swallow.",
+      "relations": {
+        "United Cities": "raids their fringes",
+        "captives": "slave soldiers"
+      },
+      "locations": [
+        "Southeastern war camps",
+        "Stobe's Gamble region"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "cannibals",
+      "name": "Cannibals",
+      "aliases": [
+        "The Cannibals",
+        "식인종",
+        "카니발",
+        "식인 부족"
+      ],
+      "keywords": [
+        "eat",
+        "tribe",
+        "north",
+        "Cannibal Plains",
+        "hunter",
+        "captive",
+        "feast"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Primitive man-eating tribes of the far northwest who hunt travelers as food.",
+      "lore": "Primitive tribes of the far northwest — the Cannibal Plains — who regard every traveler as walking meat. They hunt in large packs, club victims unconscious and carry them home to the larder. Their crude weapons barely scratch armor, but numbers and persistence have filled their bone-piles with overconfident warriors. Settlements like Mongrel and the Cannibal Hunter expeditions wage an endless cull against them.",
+      "relations": {
+        "everyone": "food",
+        "Cannibal Hunters": "hunted by them"
+      },
+      "locations": [
+        "Cannibal Plains",
+        "Leviathan Coast fringes"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "fogmen",
+      "name": "Fogmen",
+      "aliases": [
+        "The Fogmen",
+        "Fog Men",
+        "포그맨",
+        "안개인간",
+        "포그멘"
+      ],
+      "keywords": [
+        "fog",
+        "Fog Islands",
+        "deranged hiver",
+        "fog prince",
+        "eaten alive",
+        "Mongrel",
+        "shrieking"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Deranged hive-folk of the Fog Islands who drag victims to their Fog Princes to be eaten alive.",
+      "lore": "Hivers lost to madness — severed from any queen and twisted into shrieking pack-hunters who haunt the perpetual mist of the Fog Islands. They swarm travelers, club them down and carry them, still living, to be devoured before their squatting Fog Princes in rhythmic, chanting rituals. The mercenary town of Mongrel survives in their midst behind constant watch; its veterans collect Fog Prince heads like coins.",
+      "relations": {
+        "Mongrel": "endless siege",
+        "travelers": "carried off as offerings"
+      },
+      "locations": [
+        "Fog Islands"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "mongrel",
+      "name": "Mongrel",
+      "aliases": [
+        "Mongrel Town",
+        "몽그렐",
+        "몽그럴"
+      ],
+      "keywords": [
+        "mercenary",
+        "Fog Islands",
+        "bounty",
+        "fortress town",
+        "neutral",
+        "veterans"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Independent fortress town of hardened mercenaries holding out in the heart of the Fog Islands.",
+      "lore": "An independent fortress town improbably planted in the heart of the Fog Islands, populated by hardened mercenaries and people with very good reasons not to live anywhere lawful. Its walls stand constant watch against the Fogmen; its bounty office and bars welcome anyone whose money is real. No banners, no lords — just walls, contracts and the fog.",
+      "relations": {
+        "Fogmen": "endless siege",
+        "outlaws": "no questions asked"
+      },
+      "locations": [
+        "Mongrel (Fog Islands)"
+      ],
+      "recruit_resistance": "medium"
+    },
+    {
+      "id": "holy_nation_outlaws",
+      "name": "Holy Nation Outlaws",
+      "aliases": [
+        "HN Outlaws",
+        "홀리네이션 무법자",
+        "홀리 네이션 도망자"
+      ],
+      "keywords": [
+        "exile",
+        "heretic",
+        "refugee",
+        "outlaw",
+        "Okran's Shield",
+        "deserter"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Exiles, heretics and deserters from the Holy Nation scraping by in outlaw camps.",
+      "lore": "Heretics, deserters and 'impure' castoffs of the Holy Nation, scraping by in camps along Okran's Shield and the borderlands. Too hated to go home and too poor to go anywhere else, they rob travelers when begging fails. Some are genuinely dangerous; most are just hungry people whom Okran's light left behind.",
+      "relations": {
+        "The Holy Nation": "hunted",
+        "travelers": "robs when desperate"
+      },
+      "locations": [
+        "Okran's Shield camps",
+        "Border Zone fringes"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "rebel_farmers",
+      "name": "Rebel Farmers",
+      "aliases": [
+        "The Rebel Farmers",
+        "반란 농민",
+        "농민 반란군",
+        "레벨 파머"
+      ],
+      "keywords": [
+        "peasant",
+        "revolt",
+        "noble",
+        "tax",
+        "farm",
+        "pitchfork",
+        "United Cities"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Dispossessed peasants in revolt against the United Cities' nobles and their taxes.",
+      "lore": "Peasants of the United Cities who lost their farms to noble taxes and slaver quotas, and picked up iron instead of begging. They camp in the farmland fringes, ambush samurai patrols and anyone dressed rich enough to deserve it. The nobles call them bandits; the slaves whisper of them like folk heroes — though their justice is just as rough as the Empire's.",
+      "relations": {
+        "United Cities": "open revolt",
+        "nobles": "targets",
+        "the rich-looking": "fair game"
+      },
+      "locations": [
+        "UC farmland fringes",
+        "Great Desert outskirts"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "skin_bandits",
+      "name": "Skin Bandits",
+      "aliases": [
+        "The Skin Bandits",
+        "Skinners",
+        "스킨 밴딧",
+        "피부 도적",
+        "스키너"
+      ],
+      "keywords": [
+        "skeleton",
+        "skin",
+        "flay",
+        "Skinner's Roam",
+        "horror",
+        "wear",
+        "peeler"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Insane skeletons of Skinner's Roam who flay humans and wear their skin to 'become' them.",
+      "lore": "The nightmare of the southwest: insane skeletons who harvest humans, flay them in peeler machines and wear the skins, convinced this will make them people again. They drag unconscious victims back to their skin houses in Skinner's Roam. Even hardened slavers detour around their territory. Few victims are ever seen again — and those who are, are unrecognizable.",
+      "relations": {
+        "every living human": "raw material",
+        "other skeletons": "ashamed of them"
+      },
+      "locations": [
+        "Skinner's Roam",
+        "skin houses"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "second_empire",
+      "name": "Second Empire",
+      "aliases": [
+        "The Second Empire",
+        "Cat-Lon's Empire",
+        "제2제국",
+        "세컨드 엠파이어",
+        "캣론의 제국"
+      ],
+      "keywords": [
+        "Cat-Lon",
+        "Ashlands",
+        "ancient",
+        "ruins",
+        "security spider",
+        "screamer",
+        "collapse",
+        "history"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Cat-Lon (the Mad Emperor, in exile)",
+      "summary": "The fallen ancient empire whose ruins and mad machines still haunt the Ashlands under Cat-Lon.",
+      "lore": "The ancient empire whose collapse made the world what it is. Cat-Lon tried to save civilization after the first fall and ended as a tyrant; his empire drowned in war and madness. Its bones remain: ruined labs full of security spiders, broken cities in the Ashlands, and at the heart of it Cat-Lon himself — a mad emperor on an empty throne, guarded by machines that never learned the war ended. Not a faction to negotiate with; a graveyard that still shoots back.",
+      "relations": {
+        "Skeletons": "their buried past",
+        "intruders": "exterminated by old security"
+      },
+      "locations": [
+        "Ashlands",
+        "Cat-Lon's Exile",
+        "ancient labs"
+      ],
+      "recruit_resistance": "high"
+    },
+    {
+      "id": "nomads",
+      "name": "Nomads",
+      "aliases": [
+        "Nomad Caravan",
+        "Free Traders",
+        "노마드",
+        "유목민",
+        "자유 무역상"
+      ],
+      "keywords": [
+        "caravan",
+        "garru",
+        "herd",
+        "animal trader",
+        "wanderer",
+        "neutral"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Neutral wandering herders and caravaneers who trade pack animals and goods town to town.",
+      "lore": "Wandering herders and caravaneers who follow the grass and the markets, selling garru, bulls and goods from town to town. They owe allegiance to no throne and survive by being more useful alive than robbed — usually. A nomad camp at your gates means good shopping; a nomad corpse on the road means bandits are close.",
+      "relations": {
+        "everyone": "neutral traders"
+      },
+      "locations": [
+        "Roaming camps across the continent"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "the_hub",
+      "name": "The Hub",
+      "aliases": [
+        "Hub",
+        "허브",
+        "더 허브"
+      ],
+      "keywords": [
+        "ruin",
+        "waystation",
+        "bar",
+        "Border Zone",
+        "drifters",
+        "broke"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "A half-ruined waystation town in the Border Zone — one working bar, many broke drifters.",
+      "lore": "A half-ruined waystation town in the Border Zone, home to drifters, failed adventurers and one stubbornly functioning bar. Nobody rules the Hub; nobody would want to. The Shinobi Thieves keep a tower here, bandits circle it like flies, and every penniless wanderer in the region eventually washes up at its counter. Many a legendary outfit started as two broke idiots in the Hub.",
+      "relations": {
+        "Shinobi Thieves": "resident tower",
+        "bandits": "circling prey"
+      },
+      "locations": [
+        "The Hub (Border Zone)"
+      ],
+      "recruit_resistance": "low"
+    },
+    {
+      "id": "manhunters",
+      "name": "Manhunters",
+      "aliases": [
+        "The Manhunters",
+        "맨헌터",
+        "인간 사냥꾼"
+      ],
+      "keywords": [
+        "slaver",
+        "bounty",
+        "capture",
+        "north",
+        "cage",
+        "hunt"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Freelance slavers of the northlands who capture travelers to sell south in chains.",
+      "lore": "Freelance slavers who roam the northlands catching anything bipedal that can swing a hammer in a mine. Unlike the sanctioned Slave Traders they answer to no Empire law — only to the price per head in the southern markets. They travel in armed packs with cages in tow.",
+      "relations": {
+        "Slave Traders": "supplier",
+        "travelers": "merchandise"
+      },
+      "locations": [
+        "Northern zones",
+        "roaming"
+      ],
+      "recruit_resistance": "low"
+    }
+  ]
+}

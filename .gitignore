@@ -1,0 +1,32 @@
+# === 임베디드 Python 런타임 (setup_embedded_python.py로 별도 설치) ===
+server/python/
+
+# === LLM 제공자 API 키 (providers.json.example 참고해서 직접 작성) ===
+server/config/providers.json
+
+# === 임베딩 모델 (488MB, HuggingFace에서 별도 다운로드) ===
+# 다운로드: huggingface-cli download minishlab/potion-multilingual-128M --local-dir server/models/potion-multilingual-128M
+server/models/
+
+# === 캠페인 세이브 데이터 (사용자별 개인 데이터) ===
+server/campaigns/
+
+# === 로그 파일 ===
+server/logs/
+server/debug.log
+
+# === Python 캐시 ===
+server/scripts/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# === 음차 작업 체크포인트 (중간 작업 파일) ===
+server/scripts/translit_checkpoint.json
+
+# === OS / 에디터 ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

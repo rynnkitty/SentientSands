@@ -1,0 +1,11 @@
+[MEMORY DIGEST TASK]
+The following are {line_count} conversation lines involving {npc_name} in the world of Kenshi.
+
+{history_block}
+
+INSTRUCTIONS:
+1. Summarize ONLY what {npc_name} would personally remember, from {npc_name}'s point of view.
+2. Output 3 to 5 bullet lines, each starting with "- ". Each bullet is ONE short sentence.
+3. Focus on: relationship changes, promises, deals, threats, fights, debts, and notable events with named people.
+4. Preserve proper nouns exactly as written. Do NOT invent anything not present in the lines above.
+5. Output ONLY the bullet lines. No headers, no commentary.

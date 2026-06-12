@@ -1,0 +1,20 @@
+{
+  "_README": "Template for custom mod factions (rename to *.json to activate). Example entry is the UWE faction used in the design report.",
+  "factions": [
+    {
+      "id": "uwe_velakoz",
+      "name": "Velakoz",
+      "aliases": ["Velakoz Raiders", "벨라코즈"],
+      "aliases_ko_unverified": ["벨라코즈 도적단"],
+      "keywords": ["Kraz", "Shek bandits", "supremacist", "raid"],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Kraz the Mad",
+      "summary": "Supremacist Shek bandit force raiding the city outskirts.",
+      "lore": "A supremacist Shek bandit force that raids the outskirts of cities. Describe their leader, home territory, ideology and relations with other powers here — this text is injected into the prompt verbatim (300-600 characters recommended).",
+      "relations": { "Shek Kingdom": "hostile", "United Cities": "hostile" },
+      "locations": ["Raiding camps"],
+      "recruit_resistance": "high"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# SYSTEM CORE
+{system_prompt}
+
+# CHARACTERS PRESENT (primary speaker: {primary_npc})
+{npc_profiles}
+
+# CONVERSATION HISTORY (oldest to newest)
+{history_str}
+
+# FINAL INSTRUCTION
+{final_instruction}
+Keep it immersive, short, and grounded in the world of Kenshi.
+You MUST write your final response exclusively in {language_str}.
