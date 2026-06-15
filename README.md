@@ -1,4 +1,4 @@
-# Sentient Sands — 개조판 (Korean Custom Edition)
+# Sentient Sands — 개조판 (RAG Custom Edition)
 
 > Kenshi의 모든 NPC를 LLM으로 살아 움직이게 하는 AI 대화 모드 — **기억 3계층 · 팩션 RAG · 프롬프트 최적화 · 한국어 현지화 · SQLite 하이브리드 스토리지 · 벡터 기억 회상** 개조판
 
