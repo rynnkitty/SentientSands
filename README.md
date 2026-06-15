@@ -1,6 +1,6 @@
 # Sentient Sands — 개조판 (Korean Custom Edition)
 
-> Kenshi의 모든 NPC를 LLM으로 살아 움직이게 하는 AI 대화 모드 — **기억 3계층 · 팩션 RAG · 프롬프트 최적화 · 한국어 현지화** 개조판
+> Kenshi의 모든 NPC를 LLM으로 살아 움직이게 하는 AI 대화 모드 — **기억 3계층 · 팩션 RAG · 프롬프트 최적화 · 한국어 현지화 · SQLite 하이브리드 스토리지 · 벡터 기억 회상** 개조판
 
 [![RE_Kenshi](https://img.shields.io/badge/Requires-RE__Kenshi-blue)](https://github.com/BFrizzleFoShizzle/RE_Kenshi/releases)
 [![KenshiLib](https://img.shields.io/badge/Requires-KenshiLib-blue)](https://github.com/KenshiReclaimer/KenshiLib/releases)
@@ -29,9 +29,12 @@ Kenshi의 대화 시스템을 통째로 LLM에 연결합니다. 게임 내 **누
 
 **개조판 추가 기능** (상세는 [개조판 추가 기능](#개조판-추가-기능) 참조)
 
-- **기억 3계층** — 단기(원문 60줄) + 중기(자동 요약 Digest) + 장기(Durable Memory, NPC가 스스로 기록·회상)
+- **기억 3계층 강화** — 단기(20줄) + 중기 Digest(자동 요약) + 아카이브 압축 + 장기 Durable Memory(NPC 자율 기록)
 - **팩션 RAG** — 대화 내용에서 팩션을 퍼지+시맨틱 매칭으로 감지해 해당 로어만 주입. 커스텀 모드 팩션도 JSON 드롭인으로 추가 가능
-- **프롬프트 최적화** — 첫 대화 프롬프트 약 10,000 → 3.3~3.8천 토큰 (시야 필터·이벤트 중복 제거·구조화)
+- **월드 로어 청크 RAG** — world_lore.txt를 주제별 청크로 분할, 대화 관련 청크만 선택 주입 (~50% 토큰 절감)
+- **SQLite 하이브리드 스토리지** — 프로파일은 JSON(사용자 직접 편집 가능) / 대화 이력·기억은 SQLite DB로 분리 관리
+- **벡터 기반 기억 회상** — sqlite-vec KNN으로 키워드 없이 의미 기반으로 장기 기억 회상
+- **프롬프트 최적화** — 첫 대화 프롬프트 약 3,300~3,600토큰 (한글 기준 실제 API ~5,000토큰 이내)
 - **한국어 현지화** — `Language=Korean` 설정 시 NPC 응답·프로필·루머·요약 전부 한국어 + F8 UI 번역
 - **원본 버그 4건 수정** — BOM JSON 거부, 컨텍스트 덮어쓰기, 액션 태그 인자 중복, 이벤트 중복 주입
 
@@ -44,6 +47,7 @@ Kenshi의 대화 시스템을 통째로 LLM에 연결합니다. 게임 내 **누
 1. **[RE_Kenshi](https://github.com/BFrizzleFoShizzle/RE_Kenshi/releases)** — C++ 코드 주입용 스크립트 익스텐더
 2. **[KenshiLib](https://github.com/KenshiReclaimer/KenshiLib/releases)** — C++ 훅이 사용하는 라이브러리
 3. OpenAI 호환 LLM API (OpenRouter, NanoGPT, 로컬 Ollama/LM Studio, Player2 등)
+4. 인터넷 연결 — 최초 1회 Python 런타임 + 패키지 + 임베딩 모델 자동 다운로드 (~700MB)
 
 ### 절차
 
@@ -51,9 +55,21 @@ Kenshi의 대화 시스템을 통째로 LLM에 연결합니다. 게임 내 **누
 2. **이 모드 폴더 전체를 `Kenshi/mods/SentientSands/` 로 복사**
    - ⚠️ 폴더 이름은 반드시 `SentientSands` 여야 합니다. DLL이
      `mods/SentientSands/server/python/python.exe` 경로를 직접 참조합니다.
-3. **Python 설치 불필요** — 원작과 달리 개조판은 임베디드 Python 3.10 런타임(`server/python/`)을
-   동봉합니다. flask·requests·rapidfuzz·numpy·model2vec 및 임베딩 모델(512MB)까지 포함되어
-   별도 설정 스크립트를 돌릴 필요가 없습니다.
+3. **Python 환경 설치 — 최초 1회만 실행**
+
+   ```
+   mods/SentientSands/server/setup_embedded_python.py
+   ```
+
+   시스템 Python(3.x)으로 이 스크립트를 실행하면:
+   - 임베디드 Python 3.10 런타임을 `server/python/`에 자동 설치
+   - flask · requests · model2vec · numpy · **sqlite-vec** · rapidfuzz 등 패키지 설치
+   - 임베딩 모델(`potion-multilingual-128M`, ~512MB)을 HuggingFace에서 자동 다운로드
+
+   모델이 이미 있으면 다운로드를 건너뜁니다. 이후 업데이트 시 재실행해도 안전합니다.
+
+   > SSL 인증서 문제가 있는 환경(사내망 등)에서도 자동으로 우회하여 설치됩니다.
+
 4. 🚨 **반드시 `RE_Kenshi.exe`로 게임을 실행**하세요. 일반 실행 파일이나 Steam 직접 실행으로는
    모드가 로드되지 않고 AI 서버도 뜨지 않습니다.
 5. Kenshi 모드 런처에서 **SentientSands**와 **KenshiLib**를 체크
@@ -198,17 +214,16 @@ UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*
 {
   "factions": [
     {
-      "id": "uwe_velakoz",                  // 고유 ID — 같은 id면 기본 DB 항목을 덮어씀 (필수)
-      "name": "Velakoz",                    // 정식 명칭, 매칭 대상 (필수)
-      "aliases": ["Velakoz Raiders", "벨라코즈"],          // 별칭 — 검증된 한국어 음차 포함
-      "aliases_ko_unverified": ["벨라코즈 도적단"],         // 미검증 음차 — 매칭엔 쓰이되 검토 플래그
-      "keywords": ["Kraz", "Shek bandits", "raid"],       // 시맨틱 검색용 키워드
-      "source_mod": "UWE",                  // 출처 모드 표기 (관리용)
-      "is_major": false,                    // true면 주요 팩션 영입 저항 휴리스틱에 편입
+      "id": "uwe_velakoz",
+      "name": "Velakoz",
+      "aliases": ["Velakoz Raiders", "벨라코즈"],
+      "keywords": ["Kraz", "Shek bandits", "raid"],
+      "source_mod": "UWE",
+      "is_major": false,
       "leader": "Kraz the Mad",
       "summary": "도시 외곽을 약탈하는 셰크 우월주의 도적단.",
       "lore": "프롬프트에 그대로 주입되는 본문 (300~600자 권장).",
-      "relations": { "Shek Kingdom": "hostile", "United Cities": "hostile" },
+      "relations": { "Shek Kingdom": "hostile" },
       "locations": ["Raiding camps"]
     }
   ]
@@ -216,16 +231,28 @@ UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*
 ```
 
 - 허용 파일 형태: 단일 객체, 객체 배열, 또는 `{"factions": [...]}` — 템플릿은
-  `faction_lore.d/example_uwe_faction.json.example` 참조 (`.json`으로 이름 변경 시 활성화)
+  `faction_lore.d/example_uwe_faction.json.example` 참조
 - 캠페인 전용 오버라이드: `server/campaigns/{캠페인}/faction_lore.json` (최우선 순위)
 - 로드 확인: 브라우저에서 `http://127.0.0.1:5000/lore/list`
-- 매칭은 대화 텍스트에 대해 퍼지(별칭, 오타 허용) → 시맨틱(키워드·요약 임베딩) 2단계로 동작
 
-### 3. 고유 NPC 사전 정의 (canon_characters.json)
+### 3. 월드 로어 청크 편집
+
+`server/config/world_lore_chunks.json`에 세계관 정보를 주제별 청크로 정의합니다.
+대화 내용과 코사인 유사도가 높은 청크만 선택해 주입하므로, 무관한 내용이 프롬프트를 채우지 않습니다.
+
+| 필드 | 설명 |
+|---|---|
+| `id` | 청크 식별자 |
+| `always_include` | `true`면 쿼리 무관하게 항상 주입 (세계관 기본 설명에 활용) |
+| `embed_text` | 유사도 계산용 요약 키워드 (생략 시 title + text 앞부분 사용) |
+| `text` | 프롬프트에 실제 주입되는 내용 |
+
+수정 후 게임 재시작 없이 `http://127.0.0.1:5000/lore/reload`로 즉시 반영됩니다.
+
+### 4. 고유 NPC 사전 정의 (canon_characters.json)
 
 `server/config/canon_characters.json` 파일을 만들면(기본 미동봉, **선택 사항**) 특정 이름의 NPC에
-대해 LLM 자동 생성 대신 **고정 프로필**을 사용합니다. 형식은 객체 배열이며 `Name`으로 매칭됩니다
-(대소문자 무시, BOM 허용).
+대해 LLM 자동 생성 대신 **고정 프로필**을 사용합니다.
 
 ```json
 [
@@ -241,54 +268,43 @@ UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*
 ]
 ```
 
-### 4. NPC 프로필·기억 직접 편집
+### 5. NPC 프로필 직접 편집
 
-생성된 NPC는 `server/campaigns/{캠페인}/characters/{이름}.json`에 저장됩니다. 게임을 끈 상태에서
-직접 편집할 수 있습니다. UTF-8로 저장하세요 (BOM이 있어도 읽힙니다 — 개조판 수정 사항).
+생성된 NPC 프로필은 `server/campaigns/{캠페인}/characters/{이름}.json`에 저장됩니다.
+게임을 끈 상태에서 텍스트 에디터로 직접 편집하면 다음 대화에 즉시 반영됩니다.
 
-주요 필드: `Name`, `Race`, `Sex`, `Faction`, `Personality`, `Backstory`, `SpeechQuirks`,
-`Relation`(호감도), `ConversationHistory`(대화 원문 배열), `Digests`(중기 요약), `DurableMemories`(장기 기억).
+> **개조판 변경점**: 대화 이력·기억 데이터는 JSON이 아닌 SQLite DB(`sentient_sands.db`)에 분리
+> 저장됩니다. JSON에는 프로필 필드만 남으므로 파일이 훨씬 가볍습니다.
 
-장기 기억을 수동으로 심어줄 수도 있습니다.
+편집 가능한 JSON 필드: `Name`, `Race`, `Sex`, `Faction`, `Personality`, `Backstory`,
+`SpeechQuirks`, `Relation`(호감도)
 
-```json
-"DurableMemories": [
-  {
-    "id": "dm_manual_001",
-    "text": "플레이어가 노예상에게서 나를 구해주었고 나는 목숨을 빚졌다.",
-    "keywords": ["구해줌", "노예상", "은인", "빚"],
-    "w": 5,
-    "score": 5.0,
-    "created_day": 0,
-    "last_recalled_day": 0,
-    "recall_count": 0
-  }
-]
+장기 기억을 **수동으로 심어줄** 때는 게임 종료 후 `scripts/embed_existing_memories.py`를
+실행하면 해당 기억이 벡터화되어 의미 기반 회상에도 사용됩니다.
+
+```
+server\python\python.exe server\scripts\embed_existing_memories.py [캠페인명]
 ```
 
-`w`는 가중치: **5 = 영구 보존**, 3/1은 시간이 지나면 서서히 휘발(회상되면 갱신). `keywords`에 적은
-단어가 이후 대화에 등장하면 해당 기억이 프롬프트에 회상 주입됩니다.
-
-### 5. 월드 로어 · 응답 규칙 · NPC 기본 인격
+### 6. 월드 로어 · 응답 규칙 · NPC 기본 인격
 
 `server/templates/`의 전역 템플릿 (모든 캠페인 공통, 단 캠페인 폴더에 같은 이름 파일을 두면 캠페인이 우선):
 
 | 파일 | 역할 |
 |---|---|
-| `world_lore.txt` | `## WORLD LORE` 섹션 — 세계관 요약 (주요 세력 한 줄 개요 + 위험 요소) |
-| `response_rules.txt` | `## RESPONSE FORMAT RULES` — 응답 길이·금지 표현·거래 2단계·주요 팩션 영입 저항 등 행동 규칙 |
+| `world_lore.txt` | 전체 로어 원문 — `world_lore_chunks.json`이 없는 환경의 폴백 |
+| `response_rules.txt` | `## RESPONSE FORMAT RULES` — 응답 길이·금지 표현·거래 2단계·주요 팩션 영입 저항 등 |
 | `npc_base.txt` | 모든 NPC의 기본 인격 지침 (황무지 생존자 톤) |
 | `prompt_action_tags.txt` | 액션 태그 사용법 지침 (태그 추가/조정 시 DLL 호환에 주의) |
 | `prompt_*.txt` | 프로필 생성·루머 합성·기억 요약 등 내부 파이프라인 템플릿 |
 
-### 6. 이름 풀
+### 7. 이름 풀
 
 `server/config/names.json`(+ `generic_names.json`)이 자동 개명에 쓰입니다 — Male/Female/Neutral
 배열에 이름을 추가/삭제하면 됩니다. **현재 영문 이름 풀이며, 한글 음차 전환은 검토 중**입니다
 (영문 백업: `names.json.en.bak`, 변환 스크립트: `scripts/transliterate_names.py`).
-참고: `titles.json`은 현재 코드 어디서도 사용되지 않는 죽은 설정입니다.
 
-### 7. UI 번역
+### 8. UI 번역
 
 `server/config/localization.json` — F8 패널 등 UI 문자열 번역(English/Spanish/French/Japanese/Russian/**Korean** 96키). INI `language` 값과 연동됩니다.
 
@@ -297,26 +313,40 @@ UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*
 ## 개조판 추가 기능
 
 <details>
-<summary><b>기억 3계층 시스템</b> — 단기 60줄 + 자동 요약 + NPC 자율 장기 기억</summary>
+<summary><b>기억 3계층 시스템</b> — 단기 20줄 + 자동 요약 Digest + 아카이브 압축 + 장기 Durable Memory</summary>
 
-- **단기**: 대화 원문 최근 60줄을 프롬프트에 직접 주입 (`ShortTermContextCount`, 원작 20줄)
-- **중기 (Digest)**: 대화가 60줄 누적될 때마다 백그라운드 LLM이 오래된 구간을 요약해
+- **단기**: 대화 원문 최근 **20줄**을 프롬프트에 직접 주입 (`ShortTermContextCount`)
+- **중기 (Digest)**: 대화가 **30줄** 누적될 때마다 백그라운드 LLM이 오래된 구간을 요약해
   `Digests`로 보관 — 요약된 구간 원문은 주입에서 제외해 토큰 이중 사용을 차단
+- **아카이브 (Archive Summary)**: Digest가 3개 이상 쌓이면 가장 오래된 것들을 LLM이 단 하나의
+  압축 단락으로 재요약 → `[ARCHIVE]` 블록으로 프롬프트에 고정 주입. 장기 플레이 시 토큰이
+  선형 증가하지 않고 상한에 수렴
 - **장기 (Durable Memory)**: LLM이 응답 끝에 `[RECORD_MEMORY: w=5 | keywords: ... | text: ...]`
-  태그를 출력하면 서버가 가로채 NPC JSON의 `DurableMemories`에 저장 (게임에는 전달되지 않음).
-  이후 대화에 키워드가 등장하면 퍼지 매칭으로 회상해 주입. w=5는 영구, w=3/1은 선형 감쇠로
-  휘발하되 회상될 때마다 수명이 연장됨
+  태그를 출력하면 서버가 가로채 SQLite DB에 저장 (게임에는 전달되지 않음).
+  이후 대화에 키워드가 등장하면 **퍼지 매칭 또는 벡터 유사도**로 회상해 주입.
+  w=5는 영구, w=3/1은 선형 감쇠로 휘발하되 회상될 때마다 수명이 연장됨
+
+**프롬프트 주입 순서:**
+```
+[ARCHIVE — 오래된 대화 압축 요약]
+[EARLIER EVENTS — MEMORY DIGEST]
+[DURABLE MEMORIES — 장기 기억 회상]
+[RECENT DIALOGUE — 최근 20줄 원문]
+```
 
 | INI 키 | 기본값 | 설명 |
 |---|---|---|
+| `ShortTermContextCount` | **20** | 단기 대화 주입 줄수 |
 | `DigestEnabled` | 1 | 중기 요약 사용 |
-| `DigestTriggerCount` / `DigestKeepRecent` | 60 / 20 | 요약 트리거 누적 줄수 / 원문 유지 줄수 |
-| `DigestMaxCount` / `DigestInjectCount` | 5 / 3 | 보관 / 프롬프트 주입 개수 |
+| `DigestTriggerCount` / `DigestKeepRecent` | **30** / **10** | 요약 트리거 누적 줄수 / 원문 유지 줄수 |
+| `DigestMaxCount` / `DigestInjectCount` | **3** / 3 | 보관 / 프롬프트 주입 개수 |
 | `DigestCooldownSeconds` | 300 | NPC당 요약 최소 간격 |
+| `ArchiveSummaryEnabled` | 1 | 아카이브 압축 사용 |
+| `ArchiveDigestThreshold` | 3 | 아카이브 트리거 Digest 누적 수 |
 | `DurableMemoryEnabled` | 1 | 장기 기억 사용 |
 | `DurableMemoryMaxCount` / `DurableMemoryInjectCount` | 30 / 3 | 보관 / 주입 개수 |
 | `DurableMemoryInjectTokens` | 200 | 주입 토큰 예산 |
-| `DurableMemoryMatchThreshold` | 80 | 회상 키워드 매칭 임계 (0–100, 한국어 회상이 잘 안 되면 하향) |
+| `DurableMemoryMatchThreshold` | 80 | 키워드 매칭 임계 (0–100, 한국어 회상이 잘 안 되면 하향) |
 | `DurableMemoryDecayW3` / `DurableMemoryDecayW1` | 0.04 / 0.10 | w=3 / w=1 기억의 일일 감쇠율 |
 
 </details>
@@ -326,8 +356,8 @@ UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*
 
 대화 상대의 소속 팩션 + 대화 텍스트에서 감지된 팩션의 로어 블록만 `## FACTION INTEL`로 주입합니다.
 감지는 ① rapidfuzz 퍼지 매칭(별칭·오타 허용, 한국어 별칭 91건 포함) ② model2vec 임베딩 시맨틱
-매칭(potion-multilingual-128M, 512MB 동봉)의 2단계. **임베딩 모델이나 numpy/model2vec이 없어도
-퍼지 단독 모드로 완전히 동작**합니다 (모든 의존성이 try-import).
+매칭(potion-multilingual-128M)의 2단계. **임베딩 모델이나 numpy/model2vec이 없어도
+퍼지 단독 모드로 완전히 동작**합니다.
 
 | INI 키 | 기본값 | 설명 |
 |---|---|---|
@@ -344,13 +374,73 @@ UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*
 </details>
 
 <details>
-<summary><b>프롬프트 최적화</b> — 첫 대화 ~10,000tk → 3.3~3.8천tk</summary>
+<summary><b>월드 로어 청크 RAG</b> — world_lore.txt를 주제별 청크로 분할, 관련 청크만 주입</summary>
 
+`server/config/world_lore_chunks.json`에 세계관을 주제별 청크(기본 5개)로 분리합니다.
+`/chat` 요청마다 대화 쿼리와 코사인 유사도를 계산해 관련성 높은 청크(기본 top-2)만 주입합니다.
+
+- 임베딩 모델 로딩 전에는 `always_include: true` 청크만 주입해 안전하게 폴백
+- `world_lore_chunks.json`이 없으면 기존 `world_lore.txt` 전체 주입으로 자동 폴백
+- 실측 절감: ~603tk(전체) → ~298tk(청크 2개), 약 **51% 감소**
+
+| INI 키 | 기본값 | 설명 |
+|---|---|---|
+| `WorldLoreRagEnabled` | 1 | 청크 RAG 사용 (0 = 전체 주입 폴백) |
+| `WorldLoreTopK` | 2 | 유사도 상위 N개 청크 주입 |
+| `WorldLoreChunkTokenBudget` | 300 | WORLD LORE 섹션 소프트 토큰 상한 |
+
+</details>
+
+<details>
+<summary><b>SQLite 하이브리드 스토리지</b> — 프로파일은 JSON(편집 가능), 이력은 DB</summary>
+
+대화 이력·기억 데이터를 캠페인당 단일 SQLite DB(`sentient_sands.db`)로 통합합니다.
+**NPC 프로파일 JSON은 그대로 유지**되어 텍스트 에디터로 언제든 Personality 등을 수정할 수 있습니다.
+
+```
+campaigns/Default/
+├── characters/Ruka.json         ← 프로파일만 (Name, Race, Personality 등) — 편집 가능
+└── sentient_sands.db            ← 대화 100줄, 다이제스트, 장기 기억, 이벤트 이력
+```
+
+- 90일 이상 미접촉 NPC의 대화 이력은 자동 정리 (`NpcRetentionDays`)
+- 기존 JSON 데이터를 DB로 이전하는 마이그레이션 스크립트: `scripts/migrate_to_sqlite.py`
+
+| INI 키 | 기본값 | 설명 |
+|---|---|---|
+| `StorageBackend` | sqlite | 스토리지 방식: `sqlite` / `json` (레거시) |
+| `NpcRetentionDays` | 90 | 미접촉 NPC 이력 보존 기간(인게임 일수) |
+
+</details>
+
+<details>
+<summary><b>벡터 기반 장기 기억 회상</b> — 키워드 없이 의미로 기억 검색</summary>
+
+`sqlite-vec` 라이브러리의 vec0 가상 테이블을 사용해 DurableMemory 회상을 벡터 KNN 검색으로 수행합니다.
+기존 키워드 매칭과 달리 "당신이 나를 도와줬잖아요"처럼 키워드가 없는 표현으로도 관련 기억이 회상됩니다.
+
+- 벡터 데이터는 `sentient_sands.db` 내 `durable_memory_index` 테이블에 저장 (배포 불필요, 플레이 중 자동 생성)
+- sqlite-vec 로드 실패 시 자동으로 키워드 매칭 폴백
+- 기존 기억 일괄 임베딩: `scripts/embed_existing_memories.py`
+
+| INI 키 | 기본값 | 설명 |
+|---|---|---|
+| `VectorRecallEnabled` | 1 | 벡터 기반 회상 사용 (0 = 키워드 매칭만) |
+| `VectorRecallThreshold` | 0.35 | 코사인 유사도 최소 임계값 (0–1) |
+
+</details>
+
+<details>
+<summary><b>프롬프트 최적화</b></summary>
+
+- **한글 토큰 보정**: 한글 비율 30% 초과 시 토큰 추정 로직을 `len//2` 적용 (한글은 음절당 실제 2~3토큰)
+- 월드 로어 청크 RAG로 `world_lore` 섹션 ~50% 절감
 - 주변 NPC 상세 정보를 **시야 반경 내 인원으로 제한** (`NearbyMaxCount`, `NearbyDetailRadius`)
 - Yell 모드에서 비주연 청중은 1줄 프로필로 축약 (`YellCompactProfiles`)
 - 오래된/무관 이벤트 필터 (`EventFilterEnabled`, `EventFilterDays`)
-- 단기 대화 윈도우가 이미 담고 있는 사건의 이벤트 중복 주입 제거 (`DedupeChatEvents`, talk 기준 약 -200tk 실측)
+- 단기 대화 윈도우가 이미 담고 있는 사건의 이벤트 중복 주입 제거 (`DedupeChatEvents`)
 - 프롬프트 섹션 구조화 + 소프트 토큰 상한에서 오래된 히스토리부터 절삭 (`MaxPromptTokens`)
+- **실측 토큰**: 서버 추정 기준 ~3,300tk / 실제 API 청구 기준(한글 포함) ~5,000tk 이내
 
 </details>
 
@@ -392,31 +482,48 @@ INI에 키가 없으면 기본값으로 동작합니다 (하위 호환). F8 → 
 | `Language` | English | 응답·UI 언어 (Korean 지원) |
 | `TalkRadius` / `YellRadius` | 100 / 200 | Talk / Yell 도달 범위 |
 | `RadiantRange` / `RadiantDelay` | 100 / 240 | 앰비언트 대화 범위 / 주기(초) |
-| `ProximityRadius` | 200 | 주변 인지 반경 (DLL) |
 | `EnableAmbientConversations` | 1 | NPC끼리 자율 대화 |
 | `SynthesisIntervalMinutes` | 15 | 루머 합성 주기(분) |
 | `GlobalEventsCount` | 5 | 프롬프트에 넣을 최근 이벤트 수 |
 | `DialogueSpeedSeconds` / `SpeechBubbleLife` | 5 / 5.0 | 말풍선 표시 간격 / 수명(초) |
 | `MinFactionRelation` / `MaxFactionRelation` | -100 / 100 | FACTION_RELATIONS 변동 한계 |
 | `EnableWelcomePopup` | 1 | 시작 시 환영 창 |
-| `Favorites` | (빈 값) | 즐겨찾기 모델 목록 |
 
 </details>
 
 <details>
-<summary><b>개조판 신규 키 (22종)</b></summary>
+<summary><b>개조판 신규 키 (30종)</b></summary>
 
 | 키 | 기본값 | 설명 |
 |---|---|---|
-| `ShortTermContextCount` | 60 | 단기 대화 주입 줄수 |
-| `MaxPromptTokens` | 8000 | 프롬프트 소프트 상한 (초과 시 오래된 히스토리 절삭) |
+| `ShortTermContextCount` | 20 | 단기 대화 주입 줄수 |
+| `MaxPromptTokens` | 6000 | 프롬프트 소프트 상한 (초과 시 오래된 히스토리 절삭) |
 | `NearbyMaxCount` / `NearbyDetailRadius` | 8 / 10.0 | 주변 인물 목록 상한 / 상세정보 반경 |
 | `YellCompactProfiles` | 1 | Yell 모드 청중 프로필 1줄 축약 |
 | `EventFilterEnabled` / `EventFilterDays` | 1 / 3 | 이벤트 필터 / 유지 일수 |
 | `DedupeChatEvents` | 1 | 대화-이벤트 중복 주입 제거 |
-| `DigestEnabled` | 1 | 중기 요약 (세부 5종은 [기억 3계층](#개조판-추가-기능) 표 참조) |
-| `DurableMemoryEnabled` | 1 | 장기 기억 (세부 6종은 〃) |
-| `FactionRagEnabled` | 1 | 팩션 RAG (세부 6종은 〃) |
+| `DigestEnabled` | 1 | 중기 요약 |
+| `DigestTriggerCount` / `DigestKeepRecent` | 30 / 10 | 요약 트리거 / 원문 유지 줄수 |
+| `DigestMaxCount` / `DigestInjectCount` | 3 / 3 | 보관 / 주입 개수 |
+| `DigestCooldownSeconds` | 300 | NPC당 요약 최소 간격(초) |
+| `ArchiveSummaryEnabled` | 1 | 아카이브 압축 |
+| `ArchiveDigestThreshold` | 3 | 아카이브 트리거 Digest 수 |
+| `DurableMemoryEnabled` | 1 | 장기 기억 |
+| `DurableMemoryMaxCount` / `DurableMemoryInjectCount` | 30 / 3 | 보관 / 주입 개수 |
+| `DurableMemoryInjectTokens` | 200 | 주입 토큰 예산 |
+| `DurableMemoryMatchThreshold` | 80 | 키워드 매칭 임계 |
+| `DurableMemoryDecayW3` / `DurableMemoryDecayW1` | 0.04 / 0.10 | w=3 / w=1 일일 감쇠율 |
+| `FactionRagEnabled` | 1 | 팩션 RAG |
+| `FactionMatchThreshold` | 82 | 퍼지 매칭 임계 |
+| `FactionInjectCount` / `FactionInjectTokens` | 2 / 500 | 주입 블록 수 / 토큰 예산 |
+| `FactionEmbeddingEnabled` / `FactionSemanticThreshold` | 1 / 0.4 | 시맨틱 매칭 / 코사인 임계 |
+| `FactionEmbeddingModel` | potion-multilingual-128M | 모델 폴더명 |
+| `WorldLoreRagEnabled` / `WorldLoreTopK` | 1 / 2 | 청크 RAG / 상위 청크 수 |
+| `WorldLoreChunkTokenBudget` | 300 | 월드 로어 토큰 상한 |
+| `StorageBackend` | sqlite | `sqlite` / `json` |
+| `NpcRetentionDays` | 90 | 미접촉 NPC 이력 보존 기간 |
+| `VectorRecallEnabled` | 1 | 벡터 기반 기억 회상 |
+| `VectorRecallThreshold` | 0.35 | 코사인 유사도 임계 |
 
 </details>
 
@@ -427,8 +534,8 @@ INI에 키가 없으면 기본값으로 동작합니다 (하위 호환). F8 → 
 **Q. 서버가 안 뜹니다 / NPC가 응답하지 않습니다**
 - `RE_Kenshi.exe`로 실행했는지, 모드 런처에서 SentientSands + KenshiLib가 켜져 있는지 확인
 - 모드 폴더 경로가 정확히 `Kenshi\mods\SentientSands\`인지 확인 (DLL이 이 경로를 하드코딩)
-- 브라우저에서 `http://127.0.0.1:5000/ping` 접속으로 서버 생존 확인. 5000번 포트를 다른 프로그램이
-  점유 중이면 종료 (서버가 시작 시 기존 점유 프로세스를 정리하긴 합니다)
+- `server/python/` 폴더가 없다면 `setup_embedded_python.py`를 먼저 실행하세요
+- 브라우저에서 `http://127.0.0.1:5000/ping` 접속으로 서버 생존 확인
 - 로그 확인: `server/logs/server.log` (요약), `server/debug.log` (프롬프트 전문 포함 상세)
 
 **Q. LLM 연결 테스트가 실패합니다**
@@ -439,17 +546,25 @@ INI에 키가 없으면 기본값으로 동작합니다 (하위 호환). F8 → 
 - F8 → AI Settings → Language = Korean (INI `language = Korean`) 확인
 - 소형/저가 모델은 한국어 지시를 무시할 수 있습니다 — 다국어 성능이 검증된 모델 권장
 
+**Q. NPC JSON을 열었더니 ConversationHistory가 없어졌어요**
+- 개조판에서 대화 이력은 JSON이 아닌 `sentient_sands.db`에 저장됩니다.
+  JSON에는 Personality·Backstory 등 **사용자가 편집하는 프로파일 필드만** 남아 있습니다.
+  대화 기록은 DB에 정상 저장되어 있으며, 게임 내 **Dialogue Library**에서 확인할 수 있습니다.
+
 **Q. 임베딩 모델(512MB)을 지우면 어떻게 되나요?**
-- `server/models/potion-multilingual-128M` 삭제 시 팩션 RAG가 퍼지 매칭 단독 모드로 자동 전환되어
-  정상 동작합니다. 시맨틱(의미 기반) 매칭만 비활성화됩니다.
+- `server/models/potion-multilingual-128M` 삭제 시 팩션 RAG와 월드 로어 RAG가 퍼지 매칭 단독
+  모드로 자동 전환되어 정상 동작합니다. 벡터 기반 기억 회상도 키워드 매칭으로 폴백됩니다.
+  시맨틱(의미 기반) 매칭 기능만 비활성화됩니다. 모델 재다운로드: `setup_embedded_python.py` 재실행.
 
 **Q. NPC가 예전 일을 기억 못 합니다**
-- 장기 기억 회상은 키워드 기반이므로 당시 키워드(이름·장소·사건)를 대화에 언급해 보세요
-- 한국어 활용형 차이로 매칭이 빗나가면 `DurableMemoryMatchThreshold`를 80에서 70~75로 낮춰보세요
+- 키워드 매칭 회상: 당시 키워드(이름·장소·사건)를 대화에 언급해 보세요
+- 벡터 회상(`VectorRecallEnabled=1`): 의미 유사 발화로도 회상됩니다. `VectorRecallThreshold`를
+  0.35에서 0.25~0.30으로 낮추면 더 너그럽게 회상합니다
+- 수동으로 기억을 심은 경우 `embed_existing_memories.py`를 실행해 벡터 인덱스를 생성하세요
 
 **Q. 설정을 INI에서 직접 바꿨는데 적용이 안 됩니다**
 - 게임(서버) 실행 중 INI 직접 수정은 권장하지 않습니다 — F8 메뉴를 쓰거나 게임 재시작.
-  단, 팩션 로어 JSON은 실행 중 수정 후 `/lore/reload`로 즉시 반영 가능합니다.
+  단, 팩션 로어 JSON과 월드 로어 청크 JSON은 실행 중 수정 후 `/lore/reload`로 즉시 반영 가능합니다.
 
 ---
 
@@ -462,5 +577,6 @@ INI에 키가 없으면 기본값으로 동작합니다 (하위 호환). F8 → 
 - **오픈소스**: Python 3.10 (embedded) · Flask · requests ·
   [rapidfuzz](https://github.com/rapidfuzz/RapidFuzz) ·
   [model2vec](https://github.com/MinishLab/model2vec) + numpy ·
-  [potion-multilingual-128M](https://huggingface.co/minishlab/potion-multilingual-128M) (MinishLab, MIT)
+  [potion-multilingual-128M](https://huggingface.co/minishlab/potion-multilingual-128M) (MinishLab, MIT) ·
+  [sqlite-vec](https://github.com/asg017/sqlite-vec) (Alex Garcia, MIT)
 - 원작자 고지: 원작 모드는 LLM 코딩 에이전트의 도움으로 제작되었습니다. 본 개조판 역시 동일합니다.

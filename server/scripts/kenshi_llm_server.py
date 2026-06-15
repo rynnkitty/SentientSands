@@ -17,6 +17,7 @@ import logging.handlers
 import traceback
 import collections
 import difflib
+import sqlite3
 
 # --- PATH DEFINITIONS (The absolute source of truth) ---
 SCRIPT_PATH = os.path.abspath(__file__)
@@ -94,6 +95,10 @@ DIGEST_LOCK = threading.Lock()
 DIGEST_LAST_RUN = {}          # storage_id -> wall-clock time of last digest attempt (throttle)
 SYNTHESIS_STATUS = {"elapsed": 0, "interval": 60}
 
+# Phase 1: max lines stored and displayed in ConversationHistory.
+# Lowered from 250 to reduce file size and I/O over long playthroughs.
+HISTORY_MAX_LINES = 100
+
 MAJOR_FACTIONS = [
     "The Holy Nation", "United Cities", "Shek Kingdom",
     "Traders Guild", "Slave Traders", "Western Hive",
@@ -117,11 +122,16 @@ def get_config_radii():
     return r, t, y
 
 # --- Phase 0: Lightweight prompt instrumentation ---
-# Rough token estimate based on string length only (~4 chars per token for English).
-# Intentionally avoids any tokenizer dependency so it has zero performance impact.
+# Rough token estimate based on string length only. English: ~4 chars/token.
+# Korean (Hangul): ~2 chars/token — BPE tokenizers use 2-3 tokens per syllable.
+# When Korean chars exceed 30% of content, applies the stricter divisor.
+# Zero tokenizer dependency, negligible performance impact.
 def estimate_tokens(text):
     if not text:
         return 0
+    korean_chars = sum(1 for c in text if '가' <= c <= '힣')
+    if korean_chars / max(len(text), 1) > 0.3:
+        return max(1, len(text) // 2)
     return max(1, len(text) // 4)
 
 def format_token_breakdown(sections):
@@ -433,7 +443,9 @@ def load_campaign_config():
                 EVENT_HISTORY = []
         else:
             EVENT_HISTORY = []
-        # 3. Push generic names to DLL
+        # 3. Phase 3: initialize SQLite DB for this campaign
+        init_db()
+        # 4. Push generic names to DLL
         push_generic_names_to_dll()
     except Exception as e:
         logging.error(f"CAMPAIGN: Critical failure loading config: {e}")
@@ -464,15 +476,159 @@ def push_generic_names_to_dll():
         logging.error(f"Failed to sync generic names to DLL: {e}")
 
 def save_campaign_history():
+    """Phase 3: persist EVENT_HISTORY to DB (sqlite mode) or JSON (legacy)."""
+    if load_settings().get("storage_backend", "sqlite") == "sqlite":
+        try:
+            with _DB_WRITE_LOCK:
+                with get_db_connection() as conn:
+                    for line in EVENT_HISTORY:
+                        conn.execute(
+                            "INSERT OR IGNORE INTO event_history (line) VALUES (?)", (line,)
+                        )
+                    # Keep only the most recent 500 rows
+                    conn.execute("""
+                        DELETE FROM event_history WHERE id NOT IN (
+                            SELECT id FROM event_history ORDER BY id DESC LIMIT 500
+                        )
+                    """)
+                    conn.commit()
+        except Exception as e:
+            logging.error(f"DB: event_history save failed: {e}")
+    else:
+        try:
+            cdir = get_campaign_dir()
+            hist_path = os.path.join(cdir, "event_history.json")
+            with open(hist_path, "w", encoding="utf-8") as f:
+                json.dump(EVENT_HISTORY, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logging.error(f"Failed to save event history: {e}")
+
+# =====================================================================
+# Phase 3: SQLite Hybrid Storage — DB helpers (must be defined before
+# init_server_state() is called so load_campaign_config() can find them)
+# =====================================================================
+
+_DB_WRITE_LOCK = threading.Lock()  # serialize concurrent writes
+
+# Phase 4: sqlite-vec extension path (loaded once at startup)
+_SQLITE_VEC_PATH = None
+try:
+    import sqlite_vec as _sv
+    _SQLITE_VEC_PATH = _sv.loadable_path()
+    logging.info(f"VECTOR_RAG: sqlite-vec found at {_SQLITE_VEC_PATH}")
+except Exception as _e:
+    logging.warning(f"VECTOR_RAG: sqlite-vec unavailable ({_e}) — numpy fallback will be used")
+
+def get_db_path():
+    return os.path.join(get_campaign_dir(), "sentient_sands.db")
+
+def get_db_connection(vec=False):
+    """Return a WAL-mode SQLite connection. Pass vec=True to load sqlite-vec extension."""
+    conn = sqlite3.connect(get_db_path(), check_same_thread=False, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    if vec and _SQLITE_VEC_PATH:
+        try:
+            conn.enable_load_extension(True)
+            conn.load_extension(_SQLITE_VEC_PATH)
+            conn.enable_load_extension(False)
+        except Exception as e:
+            logging.warning(f"VECTOR_RAG: extension load failed: {e}")
+    return conn
+
+_DB_SCHEMA = """
+CREATE TABLE IF NOT EXISTS conversation_history (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id  TEXT NOT NULL,
+    line    TEXT NOT NULL,
+    UNIQUE(npc_id, line)
+);
+CREATE INDEX IF NOT EXISTS idx_ch_npc ON conversation_history(npc_id, id DESC);
+
+CREATE TABLE IF NOT EXISTS digests (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id      TEXT NOT NULL,
+    summary     TEXT NOT NULL,
+    from_ts     TEXT DEFAULT '',
+    to_ts       TEXT DEFAULT '',
+    created_day INTEGER DEFAULT 0,
+    line_count  INTEGER DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_dg_npc ON digests(npc_id, id ASC);
+
+CREATE TABLE IF NOT EXISTS archive_summaries (
+    npc_id  TEXT PRIMARY KEY,
+    summary TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS digest_cursors (
+    npc_id      TEXT PRIMARY KEY,
+    cursor_line TEXT DEFAULT '',
+    cursor_ts   TEXT DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS durable_memories (
+    id                TEXT PRIMARY KEY,
+    npc_id            TEXT NOT NULL,
+    text              TEXT NOT NULL,
+    keywords          TEXT DEFAULT '[]',
+    w                 INTEGER DEFAULT 1,
+    score             REAL DEFAULT 1.0,
+    created_day       INTEGER DEFAULT 0,
+    last_recalled_day INTEGER DEFAULT 0,
+    recall_count      INTEGER DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_dm_npc ON durable_memories(npc_id);
+
+CREATE TABLE IF NOT EXISTS event_history (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    line TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS npc_last_seen (
+    npc_id   TEXT PRIMARY KEY,
+    last_day INTEGER DEFAULT 0
+);
+"""
+
+# Phase 4: additional schema run with vec extension loaded
+_VEC_SCHEMA = """
+ALTER TABLE durable_memories ADD COLUMN embedding BLOB;
+"""
+_VEC_INDEX_SCHEMA = """
+CREATE VIRTUAL TABLE IF NOT EXISTS durable_memory_index USING vec0(
+    memory_id TEXT,
+    embedding FLOAT[256]
+);
+"""
+
+def init_db():
+    """Create base tables. Then add embedding column and vec0 index if sqlite-vec is available."""
     try:
-        cdir = get_campaign_dir()
-        hist_path = os.path.join(cdir, "event_history.json")
-        with open(hist_path, "w", encoding="utf-8") as f:
-            json.dump(EVENT_HISTORY, f, indent=2, ensure_ascii=False)
+        with get_db_connection() as conn:
+            conn.executescript(_DB_SCHEMA)
+        logging.info(f"DB: initialized at {get_db_path()}")
     except Exception as e:
-        logging.error(f"Failed to save event history: {e}")
+        logging.error(f"DB: init failed: {e}")
+        return
 
+    # Phase 4: add embedding column (ignore error if column already exists)
+    if _SQLITE_VEC_PATH:
+        try:
+            with get_db_connection() as conn:
+                try:
+                    conn.execute("ALTER TABLE durable_memories ADD COLUMN embedding BLOB")
+                    conn.commit()
+                except Exception:
+                    pass  # column already exists
+            with get_db_connection(vec=True) as conn:
+                conn.executescript(_VEC_INDEX_SCHEMA)
+            logging.info("VECTOR_RAG: durable_memory_index (vec0) ready.")
+        except Exception as e:
+            logging.warning(f"VECTOR_RAG: vec0 index init failed ({e}) — numpy fallback.")
 
+# =====================================================================
 
 def is_npc_name_generic(name):
     """Centralized check for generic NPC names to ensure they get unique identities."""
@@ -859,6 +1015,9 @@ INI_KEY_MAP = {
     "digest_max_count": "DigestMaxCount",
     "digest_inject_count": "DigestInjectCount",
     "digest_cooldown_seconds": "DigestCooldownSeconds",
+    # Phase 1 (archive summary)
+    "archive_summary_enabled": "ArchiveSummaryEnabled",
+    "archive_digest_threshold": "ArchiveDigestThreshold",
     # Phase 3 tunables (long-term durable memory)
     "durable_memory_enabled": "DurableMemoryEnabled",
     "durable_memory_max_count": "DurableMemoryMaxCount",
@@ -874,7 +1033,17 @@ INI_KEY_MAP = {
     "faction_inject_tokens": "FactionInjectTokens",
     "faction_embedding_enabled": "FactionEmbeddingEnabled",
     "faction_semantic_threshold": "FactionSemanticThreshold",
-    "faction_embedding_model": "FactionEmbeddingModel"
+    "faction_embedding_model": "FactionEmbeddingModel",
+    # Phase 2 tunables (world_lore chunk RAG)
+    "world_lore_rag_enabled": "WorldLoreRagEnabled",
+    "world_lore_top_k": "WorldLoreTopK",
+    "world_lore_chunk_token_budget": "WorldLoreChunkTokenBudget",
+    # Phase 3 (hybrid storage)
+    "storage_backend": "StorageBackend",
+    "npc_retention_days": "NpcRetentionDays",
+    # Phase 4 (vector recall)
+    "vector_recall_enabled": "VectorRecallEnabled",
+    "vector_recall_threshold": "VectorRecallThreshold",
 }
 
 def _save_settings_raw(settings):
@@ -922,10 +1091,10 @@ def load_settings():
         "bubble_life": 5.0,
         "language": "English",
         # Phase 0/1 tunables
-        "short_term_context_count": 60,   # history window injected into /chat (Phase 2: 60 + digest, per 결정사항 ①)
-        "max_prompt_tokens": 8000,        # soft safety net — oldest history lines are trimmed when exceeded.
-                                          # Structural target is ~5k tk (filters + digest); the hard cut stays
-                                          # higher so yell mode never starves history to zero (quality guard).
+        "short_term_context_count": 20,   # Phase 1: reduced 60→20 to cap token growth over long playthroughs
+        "max_prompt_tokens": 6000,        # soft safety net — oldest history lines are trimmed when exceeded.
+                                          # Korean mode target: ≤3,000tk (estimate); hard cut stays higher
+                                          # so yell mode never starves history to zero (quality guard).
         "nearby_max_count": 8,            # max people listed in PEOPLE NEARBY
         "nearby_detail_radius": 10.0,     # only people within this range get Health/Gear details
         "yell_compact_profiles": True,    # yell mode: 1-line profiles for non-primary listeners
@@ -936,13 +1105,16 @@ def load_settings():
         # parties in the current scene). Recording/persistence of EVENT_HISTORY is
         # NOT affected — rumor synthesis and ambient banter still see everything.
         "dedupe_chat_events": True,
-        # Phase 2 tunables (mid-term memory digest)
+        # Phase 2 tunables (mid-term memory digest) — Phase 1: tightened defaults
         "digest_enabled": True,           # master switch for the background digest system
-        "digest_trigger_count": 60,       # un-digested history lines needed before a digest job is queued
-        "digest_keep_recent": 20,         # newest lines kept OUT of the digest so the raw window never empties
-        "digest_max_count": 5,            # max digest entries stored per NPC (oldest dropped)
+        "digest_trigger_count": 30,       # Phase 1: reduced 60→30 (faster compression over long sessions)
+        "digest_keep_recent": 10,         # Phase 1: reduced 20→10 (keep raw tail lean)
+        "digest_max_count": 3,            # Phase 1: reduced 5→3 (archive handles older ones)
         "digest_inject_count": 3,         # most recent digests injected into the chat prompt
         "digest_cooldown_seconds": 300,   # per-NPC wall-clock throttle between digest LLM calls
+        # Phase 1 (archive summary) — compresses old digests into a single paragraph
+        "archive_summary_enabled": True,  # master switch for archive compression
+        "archive_digest_threshold": 3,    # digests needed before oldest ones are archived
         # Phase 3 tunables (long-term durable memory — 결정사항 ⑤)
         "durable_memory_enabled": True,        # master switch for RECORD_MEMORY storage + recall injection
         "durable_memory_max_count": 30,        # hard cap per NPC (lowest effective score dropped first; w=5 protected)
@@ -960,7 +1132,17 @@ def load_settings():
         "faction_semantic_threshold": 0.40,    # cosine similarity needed in the semantic pass
                                                # (calibrated: small-talk noise peaks ~0.34, true
                                                #  paraphrase hits score 0.50+ on potion-multilingual)
-        "faction_embedding_model": "potion-multilingual-128M"  # dir under server/models/ (or HF hub id)
+        "faction_embedding_model": "potion-multilingual-128M",  # dir under server/models/ (or HF hub id)
+        # Phase 2 tunables (world_lore chunk RAG)
+        "world_lore_rag_enabled": True,           # master switch; False → legacy full world_lore.txt
+        "world_lore_top_k": 2,                    # max non-always_include chunks injected
+        "world_lore_chunk_token_budget": 300,     # soft token cap for the whole WORLD LORE section
+        # Phase 3 (hybrid storage)
+        "storage_backend": "sqlite",   # "sqlite" | "json" — json = legacy full-JSON mode
+        "npc_retention_days": 90,      # days before idle NPC conversation history is purged
+        # Phase 4 (vector recall)
+        "vector_recall_enabled": True,        # use vec0 KNN; False = keyword fallback only
+        "vector_recall_threshold": 0.35,      # cosine similarity floor (0-1)
     }
     
     settings = defaults.copy()
@@ -1052,8 +1234,22 @@ def save_settings(new_settings):
 load_configs()
 
 def _load_event_history_from_log():
-    """Re-populate EVENT_HISTORY from the on-disk log so synthesis works after a server restart."""
-    # Use get_campaign_dir() to ensure we look in the active campaign log
+    """Re-populate EVENT_HISTORY from DB (sqlite mode) or log file (legacy)."""
+    global EVENT_HISTORY
+    # Phase 3: sqlite mode — load from event_history table
+    if load_settings().get("storage_backend", "sqlite") == "sqlite":
+        try:
+            with get_db_connection() as conn:
+                rows = conn.execute(
+                    "SELECT line FROM event_history ORDER BY id ASC"
+                ).fetchall()
+                EVENT_HISTORY = [r["line"] for r in rows]
+            logging.info(f"DB: Loaded {len(EVENT_HISTORY)} events from event_history table")
+            return
+        except Exception as e:
+            logging.warning(f"DB: event_history load failed ({e}), falling back to log file")
+
+    # Legacy: Re-populate EVENT_HISTORY from the on-disk log
     log_path = os.path.join(get_campaign_dir(), "logs", "global_events.log")
     if not os.path.exists(log_path):
         # Fallback to legacy global log location if campaign one isn't found yet
@@ -1329,6 +1525,12 @@ FACTION_LORE_PATH = os.path.join(KENSHI_SERVER_DIR, "config", "faction_lore.json
 FACTION_LORE_DIR = os.path.join(KENSHI_SERVER_DIR, "config", "faction_lore.d")
 FACTION_MODELS_DIR = os.path.join(KENSHI_SERVER_DIR, "models")
 
+# Phase 2: world_lore chunk RAG
+WORLD_LORE_CHUNKS_PATH = os.path.join(KENSHI_SERVER_DIR, "config", "world_lore_chunks.json")
+WORLD_LORE_DB = []           # normalized chunk list
+WORLD_LORE_DB_LOCK = threading.Lock()
+WORLD_LORE_EMB = {"matrix": None, "ids": [], "status": "not_started"}
+
 FACTION_DB = []                  # normalized faction entries (list of dicts)
 FACTION_DB_LOCK = threading.Lock()
 # Embedding state, owned by the background loader thread.
@@ -1457,6 +1659,129 @@ def _rebuild_faction_embeddings():
         logging.error(f"FACTION_RAG: embedding rebuild failed: {e}")
         return False
 
+def load_world_lore_chunks():
+    """Phase 2: (Re)loads world_lore_chunks.json into WORLD_LORE_DB.
+    If the file is missing, WORLD_LORE_DB stays empty and build_system_prompt()
+    falls back to the legacy full world_lore.txt injection."""
+    if not os.path.exists(WORLD_LORE_CHUNKS_PATH):
+        logging.warning("WORLD_LORE_RAG: world_lore_chunks.json not found — legacy full-text mode active.")
+        return 0
+    try:
+        with open(WORLD_LORE_CHUNKS_PATH, "r", encoding="utf-8-sig") as f:
+            data = json.load(f)
+        raw_chunks = data.get("chunks") or []
+        normalized = []
+        for c in raw_chunks:
+            if not c.get("id") or not c.get("text"):
+                continue
+            c = dict(c)
+            # embed_text: explicit field > title + first 200 chars of text
+            if not c.get("embed_text"):
+                c["embed_text"] = (c.get("title", "") + " " + c["text"][:200]).strip()
+            normalized.append(c)
+        with WORLD_LORE_DB_LOCK:
+            WORLD_LORE_DB[:] = normalized
+        # Embedding matrix is now stale — reset so _rebuild picks it up
+        with threading.Lock():
+            WORLD_LORE_EMB["matrix"] = None
+            WORLD_LORE_EMB["ids"] = []
+            WORLD_LORE_EMB["status"] = "not_started"
+        logging.info(f"WORLD_LORE_RAG: loaded {len(normalized)} chunks.")
+        return len(normalized)
+    except Exception as e:
+        logging.error(f"WORLD_LORE_RAG: load failed: {e}")
+        return 0
+
+def _rebuild_world_lore_embeddings():
+    """Phase 2: Encodes all chunk embed_text strings with the already-loaded
+    FACTION_EMB model (shared model2vec instance — zero extra memory).
+    Called after _rebuild_faction_embeddings() so the model is guaranteed ready."""
+    model = FACTION_EMB.get("model")
+    if model is None:
+        return False
+    try:
+        import numpy as np
+        with WORLD_LORE_DB_LOCK:
+            db = list(WORLD_LORE_DB)
+        if not db:
+            return False
+        docs = [c["embed_text"] for c in db]
+        mat = model.encode(docs)
+        mat = mat / (np.linalg.norm(mat, axis=1, keepdims=True) + 1e-9)
+        WORLD_LORE_EMB["matrix"] = mat
+        WORLD_LORE_EMB["ids"] = [c["id"] for c in db]
+        WORLD_LORE_EMB["status"] = "ready"
+        logging.info(f"WORLD_LORE_RAG: embedded {len(db)} chunks.")
+        return True
+    except Exception as e:
+        logging.error(f"WORLD_LORE_RAG: embedding rebuild failed: {e}")
+        return False
+
+def retrieve_world_lore_chunks(query_text, settings):
+    """Phase 2: Returns the world_lore text to inject for this prompt.
+    - always_include chunks are unconditionally added.
+    - Remaining slots (up to WorldLoreTopK) are filled by cosine similarity.
+    - Returns None when the chunk DB is empty → caller uses legacy full text.
+    - Returns '' when no chunks match and no always_include exist (rare)."""
+    if not settings.get("world_lore_rag_enabled", True):
+        return None  # feature disabled → legacy fallback
+
+    with WORLD_LORE_DB_LOCK:
+        db = list(WORLD_LORE_DB)
+    if not db:
+        return None  # no chunk file → legacy fallback
+
+    top_k = max(1, int(settings.get("world_lore_top_k", 2)))
+    token_budget = max(100, int(settings.get("world_lore_chunk_token_budget", 300)))
+
+    always = [c for c in db if c.get("always_include")]
+    candidates = [c for c in db if not c.get("always_include")]
+
+    # Semantic ranking (only when embedding matrix is ready)
+    ranked = []
+    if WORLD_LORE_EMB.get("status") == "ready" and query_text and candidates:
+        try:
+            import numpy as np
+            model = FACTION_EMB.get("model")
+            mat = WORLD_LORE_EMB.get("matrix")
+            ids = list(WORLD_LORE_EMB.get("ids") or [])
+            if model is not None and mat is not None and ids:
+                v = model.encode([str(query_text)])
+                v = v / (np.linalg.norm(v, axis=1, keepdims=True) + 1e-9)
+                sims = (mat @ v.T).ravel()
+                id_to_chunk = {c["id"]: c for c in candidates}
+                for i, cid in enumerate(ids):
+                    if cid in id_to_chunk:
+                        ranked.append((float(sims[i]), id_to_chunk[cid]))
+                ranked.sort(key=lambda x: x[0], reverse=True)
+        except Exception as e:
+            logging.error(f"WORLD_LORE_RAG: semantic search failed: {e}")
+
+    # Assemble: always_include first, then top_k ranked within token budget
+    selected = list(always)
+    used_tokens = sum(estimate_tokens(c["text"]) for c in selected)
+    added_ids = {c["id"] for c in selected}
+    added_ranked = 0
+    for _, chunk in ranked:
+        if added_ranked >= top_k:
+            break
+        if chunk["id"] in added_ids:
+            continue
+        t = estimate_tokens(chunk["text"])
+        if selected and used_tokens + t > token_budget:
+            continue
+        selected.append(chunk)
+        added_ids.add(chunk["id"])
+        used_tokens += t
+        added_ranked += 1
+
+    if not selected:
+        return None  # nothing at all → legacy fallback
+
+    chunk_ids = [c["id"] for c in selected]
+    logging.info(f"WORLD_LORE_RAG: injecting {len(selected)} chunks (~{used_tokens}tk): {chunk_ids}")
+    return "\n\n".join(c["text"] for c in selected)
+
 def _faction_embedding_worker(model_name):
     """Background loader: imports numpy/model2vec and loads the static
     embedding model (hundreds of MB — 결정사항 ②) without blocking chat.
@@ -1479,6 +1804,7 @@ def _faction_embedding_worker(model_name):
         FACTION_EMB["status"] = "ready"
         logging.info(f"FACTION_RAG: embedding model '{model_name}' loaded in {time.time() - t0:.1f}s.")
         _rebuild_faction_embeddings()
+        _rebuild_world_lore_embeddings()  # Phase 2: reuse loaded model
     except Exception as e:
         FACTION_EMB["status"] = "failed"
         FACTION_EMB["model"] = None
@@ -1720,16 +2046,28 @@ def lore_list():
 
 @app.route('/lore/reload', methods=['GET', 'POST'])
 def lore_reload():
-    """NEW endpoint (additive). Re-reads faction_lore.json (+ drop-ins) so users
-    can edit the JSON while the game is running."""
-    n = load_faction_lore()
-    return jsonify({"status": "ok", "count": n, "embedding_status": FACTION_EMB["status"]})
+    """NEW endpoint (additive). Re-reads faction_lore.json (+ drop-ins) and
+    world_lore_chunks.json so users can edit them while the game is running."""
+    n_faction = load_faction_lore()
+    n_world = load_world_lore_chunks()       # Phase 2
+    if FACTION_EMB["status"] == "ready":
+        _rebuild_world_lore_embeddings()     # Phase 2: refresh embeddings immediately
+    return jsonify({
+        "status": "ok",
+        "faction_count": n_faction,
+        "world_lore_chunks": n_world,
+        "embedding_status": FACTION_EMB["status"],
+    })
 
 # Initial DB load + background embedding loader (never blocks startup/chat)
 try:
     load_faction_lore()
 except Exception as e:
     logging.error(f"FACTION_RAG: initial lore load failed: {e}")
+try:
+    load_world_lore_chunks()  # Phase 2: load chunk definitions at startup
+except Exception as e:
+    logging.error(f"WORLD_LORE_RAG: initial chunk load failed: {e}")
 start_faction_embedding_loader()
 
 def build_system_prompt(player_name="Drifter", relevant_names=None, reveal_concealed=False, section_sink=None,
@@ -1737,12 +2075,16 @@ def build_system_prompt(player_name="Drifter", relevant_names=None, reveal_conce
     player_bio = load_prompt_component("character_bio.txt", "A mysterious drifter.")
     player_faction_desc = load_prompt_component("player_faction_description.txt", "")
     npc_base = load_prompt_component("npc_base.txt", "You are an NPC in the world of Kenshi. Stay in character.")
-    world_lore = load_prompt_component("world_lore.txt", "The world is a brutal, sword-punk wasteland.")
+    world_lore_full = load_prompt_component("world_lore.txt", "The world is a brutal, sword-punk wasteland.")
     rules = load_prompt_component("response_rules.txt", "Respond naturally to the player.")
     action_tags = load_prompt_component("prompt_action_tags.txt", "")
 
     # Combined World Events / Rumors
     settings = load_settings()
+
+    # Phase 2: chunk RAG — try selective injection, fall back to full text
+    _chunk_result = retrieve_world_lore_chunks(faction_query, settings)
+    world_lore = _chunk_result if _chunk_result is not None else world_lore_full
     ge_count = settings.get("global_events_count", 5)
     events_list = []
 
@@ -2437,6 +2779,28 @@ def add_durable_memory(data, parsed, settings=None):
     }
     data["DurableMemories"].append(entry)
     sweep_durable_memories(data, settings=settings, current_day=day)
+
+    # Phase 4: store embedding directly in DB (sqlite mode + vec available)
+    if (settings.get("storage_backend", "sqlite") == "sqlite"
+            and _SQLITE_VEC_PATH and settings.get("vector_recall_enabled", True)):
+        try:
+            npc_id = data.get("ID") or data.get("Name", "unknown")
+            emb = _embed_memory_text(parsed["text"])
+            if emb:
+                with _DB_WRITE_LOCK:
+                    with get_db_connection(vec=True) as conn:
+                        conn.execute(
+                            "UPDATE durable_memories SET embedding=? WHERE id=?",
+                            (emb, entry["id"])
+                        )
+                        conn.execute(
+                            "INSERT OR REPLACE INTO durable_memory_index(memory_id,embedding) VALUES(?,?)",
+                            (entry["id"], emb)
+                        )
+                        conn.commit()
+        except Exception as e:
+            logging.debug(f"VECTOR_RAG: embedding store skipped: {e}")
+
     return True
 
 def handle_record_memory_tags(memory_tags, npc_name, data, settings=None):
@@ -2526,6 +2890,70 @@ def recall_durable_memories(data, query_text, settings, current_day):
         m["recall_count"] = int(m.get("recall_count", 0) or 0) + 1
     return selected
 
+def recall_durable_memories_vector(data, query_text, settings, current_day):
+    """Phase 4: vector similarity recall for durable memories.
+    Uses sqlite-vec KNN when available; falls back to keyword matching."""
+    if not settings.get("durable_memory_enabled", True):
+        return []
+    if not settings.get("vector_recall_enabled", True):
+        return recall_durable_memories(data, query_text, settings, current_day)
+
+    npc_id = (data or {}).get("ID") or (data or {}).get("Name", "")
+    mems = (data or {}).get("DurableMemories") or []
+    if not mems or not query_text:
+        return []
+
+    # Try vec0 KNN path
+    if (_SQLITE_VEC_PATH and settings.get("storage_backend", "sqlite") == "sqlite"
+            and FACTION_EMB.get("status") == "ready"):
+        try:
+            import numpy as np
+            q_emb = _embed_memory_text(query_text)
+            if q_emb is None:
+                raise ValueError("embed returned None")
+
+            threshold = float(settings.get("vector_recall_threshold", 0.35))
+            inject_max = max(1, int(settings.get("durable_memory_inject_count", 3)))
+            token_budget = max(40, int(settings.get("durable_memory_inject_tokens", 200)))
+
+            with get_db_connection(vec=True) as conn:
+                rows = conn.execute("""
+                    SELECT dm.id, dm.text, dm.w, dm.score, dm.created_day,
+                           dm.last_recalled_day, dm.recall_count,
+                           (1.0 - vec_distance_cosine(dmi.embedding, ?)) AS sim
+                    FROM durable_memory_index dmi
+                    JOIN durable_memories dm ON dmi.memory_id = dm.id
+                    WHERE dm.npc_id = ? AND (1.0 - vec_distance_cosine(dmi.embedding, ?)) >= ?
+                    ORDER BY sim DESC
+                    LIMIT ?
+                """, (q_emb, npc_id, q_emb, threshold, inject_max)).fetchall()
+
+            selected = []
+            used_tokens = 0
+            mem_by_id = {m.get("id"): m for m in mems if isinstance(m, dict)}
+            for row in rows:
+                t = estimate_tokens(row["text"])
+                if used_tokens + t > token_budget:
+                    break
+                # Reinforce in-memory entry if present
+                m = mem_by_id.get(row["id"])
+                if m:
+                    m["last_recalled_day"] = current_day
+                    m["score"] = min(float(int(m.get("w", 1) or 1)),
+                                     durable_effective_score(m, current_day, settings) + 0.5)
+                    m["recall_count"] = int(m.get("recall_count", 0) or 0) + 1
+                    selected.append(m)
+                else:
+                    selected.append({"text": row["text"], "w": row["w"]})
+                used_tokens += t
+            logging.info(f"VECTOR_RAG: recalled {len(selected)} memories for {npc_id} (~{used_tokens}tk)")
+            return selected
+        except Exception as e:
+            logging.warning(f"VECTOR_RAG: vec0 recall failed ({e}) — falling back to keyword matching")
+
+    # Fallback: keyword matching
+    return recall_durable_memories(data, query_text, settings, current_day)
+
 def get_character_data(name, context="", char_id=None, skip_generate=False):
     # CRITICAL: If the name contains a pipe (serial ID), split it to get the clean name.
     # This prevents "Name|ID" from creating unique "NameID" junk profiles.
@@ -2576,13 +3004,56 @@ def get_character_data(name, context="", char_id=None, skip_generate=False):
             
     # Schema Migration for legacy files
     if data:
-        if "ConversationHistory" not in data: data["ConversationHistory"] = []
         if "Relation" not in data: data["Relation"] = 0
         if "Race" not in data: data["Race"] = "Unknown"
         if "Sex" not in data: data["Sex"] = "Unknown"
         if "Faction" not in data: data["Faction"] = "Unknown"
-        if "Digests" not in data: data["Digests"] = []  # Phase 2: mid-term memory (server-only field, DLL-safe)
-        if "DurableMemories" not in data: data["DurableMemories"] = []  # Phase 3: long-term memory (server-only field, DLL-safe)
+        # Phase 3: history fields are always reset here — DB load below overwrites them
+        data["ConversationHistory"] = []
+        data["Digests"] = []
+        data["ArchiveSummary"] = ""
+        data["DigestCursorLine"] = ""
+        data["DigestCursorTs"] = ""
+        data["DurableMemories"] = []
+
+    # Phase 3: load history/memory from DB (sqlite mode only)
+    if data and load_settings().get("storage_backend", "sqlite") == "sqlite":
+        _sid = data.get("ID", storage_id)
+        try:
+            with get_db_connection() as conn:
+                rows = conn.execute(
+                    "SELECT line FROM conversation_history WHERE npc_id=? ORDER BY id ASC",
+                    (_sid,)
+                ).fetchall()
+                data["ConversationHistory"] = [r["line"] for r in rows]
+
+                dg_rows = conn.execute(
+                    "SELECT summary,from_ts,to_ts,created_day,line_count FROM digests WHERE npc_id=? ORDER BY id ASC",
+                    (_sid,)
+                ).fetchall()
+                data["Digests"] = [dict(r) for r in dg_rows]
+
+                ar = conn.execute(
+                    "SELECT summary FROM archive_summaries WHERE npc_id=?", (_sid,)
+                ).fetchone()
+                data["ArchiveSummary"] = ar["summary"] if ar else ""
+
+                cur = conn.execute(
+                    "SELECT cursor_line,cursor_ts FROM digest_cursors WHERE npc_id=?", (_sid,)
+                ).fetchone()
+                if cur:
+                    data["DigestCursorLine"] = cur["cursor_line"]
+                    data["DigestCursorTs"] = cur["cursor_ts"]
+
+                dm_rows = conn.execute(
+                    "SELECT * FROM durable_memories WHERE npc_id=?", (_sid,)
+                ).fetchall()
+                data["DurableMemories"] = [
+                    {**dict(r), "keywords": json.loads(r["keywords"] or "[]")}
+                    for r in dm_rows
+                ]
+        except Exception as e:
+            logging.error(f"DB: history load failed for {_sid}: {e}")
 
     # If we have context, try to update race/faction if they are unknown or missing
     ctx_data = {}
@@ -2724,24 +3195,123 @@ def should_save_profile(name, storage_id, data):
 def save_character_data(storage_id, data):
     safe_filename = "".join([c for c in str(storage_id) if c.isalnum() or c in (' ', '_', '-')]).strip()
     path = os.path.join(CHARACTERS_DIR, f"{safe_filename}.json")
-    # Global safety truncation
-    if data and "ConversationHistory" in data and len(data["ConversationHistory"]) > 250:
-        data["ConversationHistory"] = data["ConversationHistory"][-250:]
 
-    # Phase 3: lazy decay sweep — expired / over-cap durable memories are
-    # pruned at write time (report 1-③ d-3). Cheap: <=30 entries per NPC.
+    # Lazy decay sweep before any persistence
     try:
         if data and data.get("DurableMemories"):
             sweep_durable_memories(data)
     except Exception as e:
         logging.error(f"DURABLE: sweep failed for {storage_id}: {e}")
 
+    settings = load_settings()
+    use_sqlite = settings.get("storage_backend", "sqlite") == "sqlite"
 
+    if use_sqlite:
+        # ── Profile → JSON (history fields excluded) ─────────────────────
+        _HISTORY_KEYS = {"ConversationHistory", "Digests", "DigestCursorLine",
+                         "DigestCursorTs", "ArchiveSummary", "DurableMemories"}
+        profile_only = {k: v for k, v in data.items() if k not in _HISTORY_KEYS}
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(profile_only, f, indent=2)
+        except Exception as e:
+            logging.error(f"Error saving profile {storage_id}: {e}")
+
+        # ── History → DB ─────────────────────────────────────────────────
+        try:
+            current_day = int(PLAYER_CONTEXT.get("day", 0) or 0)
+            with _DB_WRITE_LOCK:
+                with get_db_connection() as conn:
+                    # ConversationHistory: insert new lines, trim old ones
+                    for line in data.get("ConversationHistory", []):
+                        conn.execute(
+                            "INSERT OR IGNORE INTO conversation_history (npc_id,line) VALUES (?,?)",
+                            (storage_id, line)
+                        )
+                    conn.execute("""
+                        DELETE FROM conversation_history WHERE npc_id=? AND id NOT IN (
+                            SELECT id FROM conversation_history WHERE npc_id=?
+                            ORDER BY id DESC LIMIT ?
+                        )
+                    """, (storage_id, storage_id, HISTORY_MAX_LINES))
+
+                    # Digests: full replace
+                    conn.execute("DELETE FROM digests WHERE npc_id=?", (storage_id,))
+                    for dg in data.get("Digests", []):
+                        conn.execute(
+                            "INSERT INTO digests (npc_id,summary,from_ts,to_ts,created_day,line_count)"
+                            " VALUES (?,?,?,?,?,?)",
+                            (storage_id, dg.get("summary",""), dg.get("from_ts",""),
+                             dg.get("to_ts",""), dg.get("created_day",0), dg.get("line_count",0))
+                        )
+
+                    # ArchiveSummary
+                    ar = (data.get("ArchiveSummary") or "").strip()
+                    if ar:
+                        conn.execute(
+                            "INSERT OR REPLACE INTO archive_summaries (npc_id,summary) VALUES (?,?)",
+                            (storage_id, ar)
+                        )
+
+                    # DigestCursor
+                    conn.execute(
+                        "INSERT OR REPLACE INTO digest_cursors (npc_id,cursor_line,cursor_ts) VALUES (?,?,?)",
+                        (storage_id, data.get("DigestCursorLine",""), data.get("DigestCursorTs",""))
+                    )
+
+                    # DurableMemories: upsert
+                    for m in data.get("DurableMemories", []):
+                        conn.execute("""
+                            INSERT OR REPLACE INTO durable_memories
+                            (id,npc_id,text,keywords,w,score,created_day,last_recalled_day,recall_count)
+                            VALUES (?,?,?,?,?,?,?,?,?)
+                        """, (m.get("id", f"dm_{id(m)}"), storage_id,
+                              m.get("text",""), json.dumps(m.get("keywords",[])),
+                              m.get("w",1), float(m.get("score",1.0)),
+                              m.get("created_day",0), m.get("last_recalled_day",0),
+                              m.get("recall_count",0)))
+
+                    # npc_last_seen
+                    conn.execute(
+                        "INSERT OR REPLACE INTO npc_last_seen (npc_id,last_day) VALUES (?,?)",
+                        (storage_id, current_day)
+                    )
+                    conn.commit()
+        except Exception as e:
+            logging.error(f"DB: history save failed for {storage_id}: {e}")
+    else:
+        # ── Legacy JSON mode: save everything in one file ─────────────────
+        if data and len(data.get("ConversationHistory", [])) > HISTORY_MAX_LINES:
+            data["ConversationHistory"] = data["ConversationHistory"][-HISTORY_MAX_LINES:]
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            logging.error(f"Error saving character {storage_id}: {e}")
+
+def purge_old_npc_history(retention_days=None):
+    """Phase 3: delete conversation_history rows for NPCs not seen in N days.
+    JSON profile files are never touched — only the DB history is pruned."""
+    if load_settings().get("storage_backend", "sqlite") != "sqlite":
+        return
+    if retention_days is None:
+        retention_days = int(load_settings().get("npc_retention_days", 90))
     try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        current_day = int(PLAYER_CONTEXT.get("day", 0) or 0)
+        cutoff = current_day - retention_days
+        with _DB_WRITE_LOCK:
+            with get_db_connection() as conn:
+                deleted = conn.execute("""
+                    DELETE FROM conversation_history
+                    WHERE npc_id IN (
+                        SELECT npc_id FROM npc_last_seen WHERE last_day < ?
+                    )
+                """, (cutoff,)).rowcount
+                conn.commit()
+        if deleted:
+            logging.info(f"DB: purged {deleted} history rows (cutoff day {cutoff})")
     except Exception as e:
-        logging.error(f"Error saving character {storage_id}: {e}")
+        logging.error(f"DB: purge failed: {e}")
 
 # =====================================================================
 # Phase 2: MID-TERM MEMORY DIGEST (report section 1-②, 결정사항 ①)
@@ -2830,6 +3400,77 @@ def maybe_queue_digest(storage_id, data, settings=None):
     except Exception as e:
         logging.error(f"DIGEST: queue check failed for {storage_id}: {e}")
 
+def _embed_memory_text(text):
+    """Phase 4: encode text with the loaded FACTION_EMB model2vec model.
+    Returns normalised float32 bytes for SQLite BLOB, or None on failure."""
+    try:
+        model = FACTION_EMB.get("model")
+        if model is None:
+            return None
+        import numpy as np
+        v = model.encode([str(text)])
+        v = v / (np.linalg.norm(v, axis=1, keepdims=True) + 1e-9)
+        return v[0].astype("float32").tobytes()
+    except Exception as e:
+        logging.debug(f"VECTOR_RAG: embed failed: {e}")
+        return None
+
+def maybe_archive_digests(storage_id, data, settings=None):
+    """Phase 1: when Digests >= threshold, compress the oldest ones into a single
+    ArchiveSummary paragraph via one LLM call and keep only the latest digest.
+    Returns True if archiving succeeded, False on LLM failure (digests unchanged)."""
+    if settings is None:
+        settings = load_settings()
+    if not settings.get("archive_summary_enabled", True):
+        return False
+
+    digests = data.get("Digests") or []
+    threshold = max(2, int(settings.get("archive_digest_threshold", 3)))
+    if len(digests) < threshold:
+        return False
+
+    # All but the newest digest are candidates for archiving
+    to_archive = digests[:-1]
+    keep = digests[-1:]
+
+    # Build input text: prepend any existing ArchiveSummary so it is re-compressed
+    parts = []
+    existing = (data.get("ArchiveSummary") or "").strip()
+    if existing:
+        parts.append("[이전 아카이브]\n" + existing)
+    for dg in to_archive:
+        span = ""
+        if dg.get("from_ts") or dg.get("to_ts"):
+            span = "(%s ~ %s)\n" % (dg.get("from_ts", "?"), dg.get("to_ts", "?"))
+        parts.append(span + (dg.get("summary") or "").strip())
+    combined = "\n\n".join(p for p in parts if p)
+
+    lang = settings.get("language", "English")
+    prompt = (
+        "[ARCHIVE COMPRESSION TASK]\n"
+        "Compress the following conversation summaries into a single compact paragraph "
+        "capturing only the most important relationship facts, promises, and events. "
+        "Keep it under 100 words.\n\n"
+        + combined
+        + aux_language_rule("the compressed archive paragraph", lang)
+    )
+    messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": "Write the compressed archive now."}
+    ]
+    logging.info("ARCHIVE: compressing %d digests for %s...", len(to_archive), storage_id)
+    result = call_llm(messages, max_tokens=200, temperature=0.3)
+
+    if not result or len(result.strip()) < 5:
+        logging.warning("ARCHIVE: LLM call failed for %s — keeping original digests.", storage_id)
+        return False
+
+    data["ArchiveSummary"] = result.strip()[:600]
+    data["Digests"] = keep
+    logging.info("ARCHIVE: saved ArchiveSummary for %s (%dtk).", storage_id, estimate_tokens(data["ArchiveSummary"]))
+    return True
+
+
 def process_digest_job(storage_id):
     """Runs inside the single digest worker thread. Summarizes the oldest
     un-digested lines (keeping the newest DigestKeepRecent raw) via one LLM
@@ -2912,10 +3553,12 @@ INSTRUCTIONS:
     if "Digests" not in fresh or not isinstance(fresh.get("Digests"), list):
         fresh["Digests"] = []
     fresh["Digests"].append(entry)
-    max_keep = max(1, int(settings.get("digest_max_count", 5)))
+    max_keep = max(1, int(settings.get("digest_max_count", 3)))
     fresh["Digests"] = fresh["Digests"][-max_keep:]
     fresh["DigestCursorLine"] = last_line
     fresh["DigestCursorTs"] = ts_match.group(0) if ts_match else ""
+    # Phase 1: archive old digests before saving if threshold exceeded
+    maybe_archive_digests(storage_id, fresh, settings)
     save_character_data(storage_id, fresh)
     logging.info(f"DIGEST: saved digest for {npc_name} ({entry['from_ts']} ~ {entry['to_ts']}, "
                  f"{len(segment)} lines -> ~{estimate_tokens(summary_text)}tk).")
@@ -2979,9 +3622,9 @@ def log_dialogue():
         char_data["ConversationHistory"].append(f"{time_prefix}{npc_name}: {npc_response}")
         record_event_to_history("DIALOGUE", npc_name, player_name, npc_response)
         
-    # Limit history to 250 lines to prevent massive file sizes and UI lag
-    if len(char_data["ConversationHistory"]) > 250:
-        char_data["ConversationHistory"] = char_data["ConversationHistory"][-250:]
+    # Limit history to HISTORY_MAX_LINES to prevent massive file sizes and UI lag
+    if len(char_data["ConversationHistory"]) > HISTORY_MAX_LINES:
+        char_data["ConversationHistory"] = char_data["ConversationHistory"][-HISTORY_MAX_LINES:]
     
     if should_save_profile(npc_name, storage_id, char_data):
         save_character_data(storage_id, char_data)
@@ -3680,7 +4323,7 @@ def chat():
         try:
             current_day = int(PLAYER_CONTEXT.get("day", 0) or 0)
             recall_query = "\n".join([player_message or ""] + raw_tail[-3:])
-            recalled = recall_durable_memories(primary_data, recall_query, settings, current_day)
+            recalled = recall_durable_memories_vector(primary_data, recall_query, settings, current_day)
             if recalled:
                 mem_lines = "\n".join(f"- {m.get('text', '')}" for m in recalled)
                 durable_block = (f"[DURABLE MEMORIES — {primary_npc}'s long-term memories relevant to this moment]\n"
@@ -3706,9 +4349,16 @@ def chat():
     if durable_block and not digest_block:
         durable_block += "[RECENT DIALOGUE]\n"
 
+    # Phase 1: ArchiveSummary block — injected before digest/durable blocks
+    archive_block = ""
+    _archive_text = (primary_data.get("ArchiveSummary") or "").strip()
+    if _archive_text and settings.get("archive_summary_enabled", True):
+        archive_block = ("[ARCHIVE — 핵심 관계 요약 (오래된 대화 압축)]\n"
+                         + _archive_text + "\n\n")
+
     def _compose_history_str():
         joined = "\n".join(recent_history)
-        prefix = durable_block + digest_block
+        prefix = archive_block + durable_block + digest_block
         return (prefix + joined) if prefix else joined
 
     history_str = _compose_history_str()
@@ -3882,6 +4532,7 @@ You MUST write your final response exclusively in {language_str}.
             + format_token_breakdown({
                 "system": dynamic_system_prompt,
                 "profiles": npc_profiles,
+                "archive": archive_block,
                 "durable": durable_block,
                 "digest": digest_block,
                 "history_raw": "\n".join(recent_history),
@@ -4161,9 +4812,9 @@ You MUST write your final response exclusively in {language_str}.
                 player_faction = PLAYER_CONTEXT.get("faction", "None")
                 record_event_to_history("CHAT", primary_npc, player_name, content, actor_faction=primary_faction, target_faction=player_faction)
 
-            # Limit history to 250 lines
-            if len(char_datas[name]["ConversationHistory"]) > 250:
-                char_datas[name]["ConversationHistory"] = char_datas[name]["ConversationHistory"][-250:]
+            # Limit history to HISTORY_MAX_LINES
+            if len(char_datas[name]["ConversationHistory"]) > HISTORY_MAX_LINES:
+                char_datas[name]["ConversationHistory"] = char_datas[name]["ConversationHistory"][-HISTORY_MAX_LINES:]
                 
             storage_id = char_datas[name].get("ID", name)
             # CRITICAL: Prevent transient fallback profiles from overwriting real ones
@@ -4837,8 +5488,8 @@ def get_history():
     lines.append("-" * 30)
     lines.append(f"CONVERSATION LOG (Showing last 250 of {len(history)} lines):")
     if history:
-        # Limit display to 250 lines to prevent UI freeze
-        trimmed_history = history[-250:]
+        # Limit display to HISTORY_MAX_LINES to prevent UI freeze
+        trimmed_history = history[-HISTORY_MAX_LINES:]
         for log_line in trimmed_history:
             lines.append(_wrap(log_line))
     else:

@@ -14,6 +14,7 @@ server/campaigns/
 # === 로그 파일 ===
 server/logs/
 server/debug.log
+server/debug.log.*
 
 # === Python 캐시 ===
 server/scripts/__pycache__/
@@ -22,8 +23,16 @@ server/scripts/__pycache__/
 *.pyd
 __pycache__/
 
+# === SQLite 데이터베이스 (캠페인별 자동 생성, 배포 불필요) ===
+*.db
+*.db-shm
+*.db-wal
+
 # === 음차 작업 체크포인트 (중간 작업 파일) ===
 server/scripts/translit_checkpoint.json
+
+# === Python 바이트코드 캐시 ===
+server/scripts/__pycache__/
 
 # === OS / 에디터 ===
 .DS_Store

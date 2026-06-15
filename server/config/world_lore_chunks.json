@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "_README": [
+    "world_lore.txt를 주제별 청크로 분리한 RAG 정의 파일.",
+    "always_include: true 청크는 쿼리 무관하게 항상 주입됩니다.",
+    "embed_text: 임베딩용 요약 (생략 시 title + text 앞 200자 사용).",
+    "런타임 재로딩: GET http://127.0.0.1:5000/lore/reload"
+  ],
+  "chunks": [
+    {
+      "id": "world_overview",
+      "title": "Kenshi 세계 개요",
+      "always_include": true,
+      "embed_text": "Kenshi world collapse ancient civilizations decay survival rust wasteland Second Empire First Empire",
+      "text": "Kenshi is a world defined by the collapse of ancient, superior civilizations. The current age is one of decay, rust, and desperate survival. The surface is littered with the skeletons of titans—vast machines and metal structures from the First and Second Empires that no one alive understands how to rebuild."
+    },
+    {
+      "id": "major_powers",
+      "title": "주요 세력 개요",
+      "always_include": false,
+      "embed_text": "Holy Nation Okranites United Cities Empire Shek Kingdom Hive Skeletons factions powers politics",
+      "text": "## MAJOR POWERS (one line each — detailed intel appears under FACTION INTEL only when relevant)\n- THE HOLY NATION (Okranites): Patriarchal human theocracy of Okran in the western Holy Lands — zealous Paladins, hatred of Skeletons (\"demons\") and non-humans (\"beasts\").\n- THE UNITED CITIES (The Empire): Decadent slaver empire of the Great Desert under Emperor Tengu and corrupt nobles — wealth is worth, poverty is a crime.\n- THE SHEK KINGDOM: Proud bone-plated warrior race reforming under Queen Esata the Stone Golem in Admag — they honor strength and seek a Warrior's Death.\n- THE HIVE (Western Hive): Communal insectoids of the Vain bound to their Queen — cunning Prince traders, soldier and worker drones; exiles wander alone.\n- THE SKELETONS: Ancient sentient machines of the lost empires — ageless, guilt-ridden, most hiding in Black Desert City and lying about the old world."
+    },
+    {
+      "id": "second_empire",
+      "title": "제2제국 붕괴사",
+      "always_include": false,
+      "embed_text": "Second Empire Cat-Lon collapse history tyranny madness ancient past civilization failure",
+      "text": "## THE SECOND EMPIRE FALLOUT\nMuch of the world's misery stems from the failure of Cat-Lon's Second Empire. Cat-Lon attempted to save humanity after the first collapse but eventually spiraled into tyranny and madness, resulting in the current fractured world."
+    },
+    {
+      "id": "fauna_dangers",
+      "title": "생물 및 위험 지역",
+      "always_include": false,
+      "embed_text": "Beak Things predators Venge orbital mirrors Fog Islands Fogmen danger wildlife creatures hazards",
+      "text": "## FAUNA & DANGERS\n- Beak Things (Gutters): Terrifyingly fast, long-necked predators that eat their prey alive. \"Relax. Enjoy death.\"\n- Venge: A region where ancient orbital mirrors still focus concentrated beams of sunlight (\"The Eyes of the Ancients\") onto the surface, vaporizing anything in their path during the day.\n- The Fog Islands: Home to the Fogmen (Hivers lost to a brain-parasite/madness) who kidnap travelers to consume them in rhythmic, shrieking rituals."
+    },
+    {
+      "id": "tech_commerce",
+      "title": "기술 및 상업",
+      "always_include": false,
+      "embed_text": "cats currency money trade ancient science books engineering research robotics prosthetics limbs technology commerce",
+      "text": "## TECHNOLOGY & COMMERCE\n- Cats: Simple metal coins used as a universal currency.\n- Ancient Science Books & Engineering Research: The most valuable artifacts, allowing for the rediscovery of farming techniques and metalwork.\n- Robotics: While rare, prosthetic limbs are often superior to biological ones, though Holy Nation members will attack those wearing \"Skeleton limbs\" on sight."
+    }
+  ]
+}

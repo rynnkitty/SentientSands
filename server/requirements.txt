@@ -1,2 +1,14 @@
+# SentientSands_custom server dependencies
+# Run setup_embedded_python.py to install these into the embedded Python runtime.
+
+# Web server
 flask
 requests
+
+# Embeddings & vector search (Faction RAG + world_lore RAG + DurableMemory vector recall)
+model2vec
+numpy
+sqlite-vec
+
+# Fuzzy keyword matching (DurableMemory recall fallback)
+rapidfuzz
