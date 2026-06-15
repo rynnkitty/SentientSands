@@ -2328,10 +2328,17 @@ def call_llm(messages, max_tokens=2048, temperature=0.8):
                 # Robust Reasoning Block Removal
                 if "</thought>" in content:
                     content = content.split("</thought>")[-1]
-                
+
                 # Strip XML-like thought tags if they remain
                 content = re.sub(r'<thought>.*?</thought>', '', content, flags=re.DOTALL | re.IGNORECASE)
                 content = re.sub(r'<thought>.*', '', content, flags=re.DOTALL | re.IGNORECASE)
+
+                # Strip [THINK]...[/THINK] internal scratchpad blocks (from prompt_chat_template).
+                # Must happen here, before action-tag parsing, so [THINK] is never mis-parsed
+                # as an action tag by the downstream regex.
+                content = re.sub(r'\[THINK\].*?\[/THINK\]', '', content, flags=re.DOTALL | re.IGNORECASE)
+                # Handle unclosed [THINK] (model stopped mid-reasoning)
+                content = re.sub(r'\[THINK\].*', '', content, flags=re.DOTALL | re.IGNORECASE)
 
                 # Strip internal reasoning prefixes
                 if "\n\n" in content and ("thought" in CURRENT_MODEL_KEY.lower() or content.strip().lower().startswith("thought:")):

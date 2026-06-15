@@ -9,5 +9,15 @@
 
 # FINAL INSTRUCTION
 {final_instruction}
-Keep it immersive, short, and grounded in the world of Kenshi.
+
+Before writing your dialogue, briefly reason inside [THINK][/THINK] tags — this is your private scratchpad and will never be shown to the player:
+[THINK]
+1. Which PERSONALITY trait is shaping this reaction?
+2. Which part of BACKSTORY or current condition is relevant to this moment?
+3. How do recent conversation, this player's memory, and RELATION shape this reaction?
+4. What does this NPC want or avoid in this moment? (inner and outer goal may or may not differ)
+5. Does this line fit the above, and read as THIS NPC's voice rather than a generic response?
+[/THINK]
+
+Then write ONLY the dialogue line. Keep it immersive, short, and grounded in the world of Kenshi.
 You MUST write your final response exclusively in {language_str}.
