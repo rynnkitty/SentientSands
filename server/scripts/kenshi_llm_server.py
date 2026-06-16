@@ -1778,9 +1778,14 @@ def retrieve_world_lore_chunks(query_text, settings):
     if not selected:
         return None  # nothing at all → legacy fallback
 
+    def _chunk_text(c):
+        src = c.get("source", "vanilla")
+        prefix = f"[{src.upper()}] " if src and src.lower() != "vanilla" else ""
+        return prefix + c["text"]
+
     chunk_ids = [c["id"] for c in selected]
     logging.info(f"WORLD_LORE_RAG: injecting {len(selected)} chunks (~{used_tokens}tk): {chunk_ids}")
-    return "\n\n".join(c["text"] for c in selected)
+    return "\n\n".join(_chunk_text(c) for c in selected)
 
 def _faction_embedding_worker(model_name):
     """Background loader: imports numpy/model2vec and loads the static
@@ -1957,7 +1962,9 @@ def resolve_faction_by_name(faction_name):
 
 def _format_faction_intel(f):
     """One injected lore block (~100-150tk)."""
-    lines = [f"### {f['name']}" + (f" — {f['summary']}" if f.get("summary") else "")]
+    src = f.get("source_mod", "vanilla")
+    label = f" [{src}]" if src and src.lower() != "vanilla" else ""
+    lines = [f"### {f['name']}{label}" + (f" — {f['summary']}" if f.get("summary") else "")]
     if f.get("lore"):
         lines.append(f["lore"])
     extras = []

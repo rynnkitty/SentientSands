@@ -4,12 +4,15 @@
     "world_lore.txt를 주제별 청크로 분리한 RAG 정의 파일.",
     "always_include: true 청크는 쿼리 무관하게 항상 주입됩니다.",
     "embed_text: 임베딩용 요약 (생략 시 title + text 앞 200자 사용).",
+    "source: 청크 출처 — 'vanilla'(기본값/생략 가능) 또는 모드명(예: 'UWE').",
+    "  vanilla 이외의 source는 주입 시 '[SOURCE] ' 접두사가 붙습니다.",
     "런타임 재로딩: GET http://127.0.0.1:5000/lore/reload"
   ],
   "chunks": [
     {
       "id": "world_overview",
       "title": "Kenshi 세계 개요",
+      "source": "vanilla",
       "always_include": true,
       "embed_text": "Kenshi world collapse ancient civilizations decay survival rust wasteland Second Empire First Empire",
       "text": "Kenshi is a world defined by the collapse of ancient, superior civilizations. The current age is one of decay, rust, and desperate survival. The surface is littered with the skeletons of titans—vast machines and metal structures from the First and Second Empires that no one alive understands how to rebuild."
@@ -17,6 +20,7 @@
     {
       "id": "major_powers",
       "title": "주요 세력 개요",
+      "source": "vanilla",
       "always_include": false,
       "embed_text": "Holy Nation Okranites United Cities Empire Shek Kingdom Hive Skeletons factions powers politics",
       "text": "## MAJOR POWERS (one line each — detailed intel appears under FACTION INTEL only when relevant)\n- THE HOLY NATION (Okranites): Patriarchal human theocracy of Okran in the western Holy Lands — zealous Paladins, hatred of Skeletons (\"demons\") and non-humans (\"beasts\").\n- THE UNITED CITIES (The Empire): Decadent slaver empire of the Great Desert under Emperor Tengu and corrupt nobles — wealth is worth, poverty is a crime.\n- THE SHEK KINGDOM: Proud bone-plated warrior race reforming under Queen Esata the Stone Golem in Admag — they honor strength and seek a Warrior's Death.\n- THE HIVE (Western Hive): Communal insectoids of the Vain bound to their Queen — cunning Prince traders, soldier and worker drones; exiles wander alone.\n- THE SKELETONS: Ancient sentient machines of the lost empires — ageless, guilt-ridden, most hiding in Black Desert City and lying about the old world."
@@ -24,6 +28,7 @@
     {
       "id": "second_empire",
       "title": "제2제국 붕괴사",
+      "source": "vanilla",
       "always_include": false,
       "embed_text": "Second Empire Cat-Lon collapse history tyranny madness ancient past civilization failure",
       "text": "## THE SECOND EMPIRE FALLOUT\nMuch of the world's misery stems from the failure of Cat-Lon's Second Empire. Cat-Lon attempted to save humanity after the first collapse but eventually spiraled into tyranny and madness, resulting in the current fractured world."
@@ -31,6 +36,7 @@
     {
       "id": "fauna_dangers",
       "title": "생물 및 위험 지역",
+      "source": "vanilla",
       "always_include": false,
       "embed_text": "Beak Things predators Venge orbital mirrors Fog Islands Fogmen danger wildlife creatures hazards",
       "text": "## FAUNA & DANGERS\n- Beak Things (Gutters): Terrifyingly fast, long-necked predators that eat their prey alive. \"Relax. Enjoy death.\"\n- Venge: A region where ancient orbital mirrors still focus concentrated beams of sunlight (\"The Eyes of the Ancients\") onto the surface, vaporizing anything in their path during the day.\n- The Fog Islands: Home to the Fogmen (Hivers lost to a brain-parasite/madness) who kidnap travelers to consume them in rhythmic, shrieking rituals."
@@ -38,9 +44,34 @@
     {
       "id": "tech_commerce",
       "title": "기술 및 상업",
+      "source": "vanilla",
       "always_include": false,
       "embed_text": "cats currency money trade ancient science books engineering research robotics prosthetics limbs technology commerce",
       "text": "## TECHNOLOGY & COMMERCE\n- Cats: Simple metal coins used as a universal currency.\n- Ancient Science Books & Engineering Research: The most valuable artifacts, allowing for the rediscovery of farming techniques and metalwork.\n- Robotics: While rare, prosthetic limbs are often superior to biological ones, though Holy Nation members will attack those wearing \"Skeleton limbs\" on sight."
+    },
+    {
+      "id": "uwe_new_territories",
+      "title": "UWE 신규 적대 세력 거점",
+      "source": "UWE",
+      "always_include": false,
+      "embed_text": "UWE new factions Bastards Bast Deluged Floodlands Scorched Ones Burning Forest Desolate Plunderers Shun Hill Marauders Border Zone Swamp Ruffians Dune Renegades Hook Raiders Kopek settlements territories",
+      "text": "## UWE NEW FACTION TERRITORIES\nThe Universal Wasteland Expansion adds several new hostile factions with their own settlements:\n- THE BASTARDS: Control Bastion Overlook in the Bast region — enemies of United Cities, Holy Nation, and all law.\n- THE DELUGED: Occupy the Flooded Oasis in the Floodlands — hostile to United Cities, Holy Nation, and Cannibals alike.\n- THE SCORCHED ONES: Hold the Scorched Outpost in the Burning Forest — hostile to United Cities, Holy Nation, and police.\n- DESOLATE PLUNDERERS: Entrenched in Fort Desolation in Shun — outlaws hostile to the United Cities and the Old Empire.\n- HILL MARAUDERS: Command the Hill Marauder King Tower in the Border Zone — raiders against United Cities and police.\n- SWAMP RUFFIANS: Rule the Swamp Ruffian King Tower in the Swamp and South Wetlands — hostile to all law.\n- DUNE RENEGADES: Based in Shraff across the Great Desert — anti-Empire rebels allied with Rebel Farmers and Hook Raiders.\n- HOOK RAIDERS: Hold Kopek in The Hook and Shun — anti-slavery outlaws allied with Dune Renegades."
+    },
+    {
+      "id": "uwe_new_hive_variants",
+      "title": "UWE 신규 하이브 변종",
+      "source": "UWE",
+      "always_include": false,
+      "embed_text": "UWE hive variants Mechanical Hive iron desert Midland Hive Dreg Northern Hive coast Savage Hive Purple Sands new hive factions",
+      "text": "## UWE NEW HIVE VARIANTS\nThe Universal Wasteland Expansion introduces four new Hive factions beyond the vanilla Western and Southern Hives:\n- MECHANICAL HIVE: Metal-bodied drones inhabiting the Grey Desert, Black Desert, Iron Valleys, and Iron Trail — allied with no Hive faction except their own kind; hostile to the Southern Hive.\n- MIDLAND HIVE: A Hive colony in the Dreg region, allied with Western and Northern Hives — their pacifier is found in Mongrel.\n- NORTHERN HIVE: Established on the Northern Coast and in Sinkuun — allied with Western and Midland Hives; hostile to the Southern Hive.\n- SAVAGE HIVE: An isolated colony in the Purple Sands with no known alliances — their small village is the only presence in the region."
+    },
+    {
+      "id": "uwe_faction_contacts",
+      "title": "UWE 팩션 외교관 위치",
+      "source": "UWE",
+      "always_include": false,
+      "embed_text": "UWE faction pacifier diplomat contact location where find Bele'coz Dune Renegades Highlanders Narko Disciples Bastards Deluged Scorched Mechanical Hive Northern Hive Midland Hive Swamp Ruffians",
+      "text": "## UWE FACTION PACIFIER LOCATIONS\nTo make contact with UWE factions, their diplomatic representatives (pacifiers) can be found at:\n- Bele'coz: Drifter's Last\n- Dune Renegades: World's End\n- Highlanders: Sho-Battai (also Waystation HQs in Border Zone, HN Territory, Shem)\n- Hill Marauders: Shark\n- Hiningenteki Hantas: Blister Hill\n- Hook Raiders: Shark\n- Mechanical Hive: Black Desert City, Rusted Ridge\n- Midland Hive: Mongrel\n- Narko's Disciples: Black Scratch\n- Northern Hive: World's End\n- Swamp Ruffians: Flats Lagoon\n- The Bastards: World's End\n- The Deluged: World's End\n- Desolate Plunderers: Last Stand\n- The Scorched Ones: Black Desert City\nNote: All UWE minor faction pacifiers may also appear at Waystation towns."
     }
   ]
 }

@@ -1,0 +1,662 @@
+{
+  "schema_version": 1,
+  "_README": "UWE_Info.md §6~8 기반 UWE 모드 신규 23개 팩션. 로어 본문은 biome/relations/town 데이터로부터 보수적으로 작성됨 — 사용자 검수 권장. 2026-06-16",
+  "factions": [
+    {
+      "id": "uwe_belecoz",
+      "name": "Bele'coz",
+      "aliases": [
+        "Bele'coz",
+        "Belecoz",
+        "벨레코즈",
+        "Sakar"
+      ],
+      "keywords": [
+        "Spider Plains",
+        "Stenn Desert",
+        "Sakar",
+        "anti-Shek",
+        "anti-Holy Nation"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "A hostile faction controlling the Sakar settlement in the Spider Plains and Stenn Desert, enemies of both Shek and Holy Nation.",
+      "lore": "Bele'coz are a dangerous faction rooted in the harsh Spider Plains and Stenn Desert. They have made bitter enemies of both the Shek Kingdom and the Holy Nation, yet maintain a working relationship with the Shinobi Thieves, suggesting they deal in information or contraband. Their base, Sakar, sits at a crossroads between dangerous territories. Travellers can find their pacifier at Drifter's Last.",
+      "locations": ["Sakar"],
+      "relations": {
+        "Shek Kingdom": "hostile",
+        "Holy Nation": "hostile",
+        "Shinobi Thieves": "friendly"
+      }
+    },
+    {
+      "id": "uwe_black_gorillos",
+      "name": "Black Gorillos",
+      "aliases": [
+        "Black Gorillos",
+        "블랙 고릴로",
+        "검은 고릴로",
+        "Black Dog"
+      ],
+      "keywords": [
+        "gorillo",
+        "Southern Hive",
+        "Black Dog",
+        "wildlife faction"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Black Dog",
+      "summary": "A pack of black gorillo animals led by the fearsome Black Dog, allied with the Southern Hive.",
+      "lore": "The Black Gorillos are a fearsome pack of black-furred gorillo creatures under the leadership of Black Dog, a particularly powerful specimen. Unlike most wildlife, they appear to have forged an alliance of sorts with the Southern Hive — whether through territory sharing or mutual hunting grounds is unclear. Encountering a pack near Southern Hive territory is common.",
+      "locations": [],
+      "relations": {
+        "Southern Hive": "allied"
+      }
+    },
+    {
+      "id": "uwe_blue_cleavers",
+      "name": "Blue Cleavers",
+      "aliases": [
+        "Blue Cleavers",
+        "블루 클리버",
+        "Blue Cleaver Boss",
+        "Blue Cleaver Hideout"
+      ],
+      "keywords": [
+        "The Swamp",
+        "swamp gang",
+        "Blue Cleaver Hideout",
+        "rival gangs"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Blue Cleaver Boss",
+      "summary": "A swamp gang operating from the Blue Cleaver Hideout, locked in conflict with every other major swamp faction.",
+      "lore": "The Blue Cleavers are a swamp gang making their base at the Blue Cleaver Hideout deep in the wetlands. They are at war with every major rival in the region — the Swamp Ninjas, the Red Sabres, and the Green Katanas. This constant multi-front conflict defines their existence. Unlike the older five swamp gangs, the Blue Cleavers are a newer presence willing to carve out their own territory by force.",
+      "locations": ["Blue Cleaver Hideout"],
+      "relations": {
+        "Swamp Ninjas": "hostile",
+        "Red Sabres": "hostile",
+        "Green Katanas": "hostile"
+      }
+    },
+    {
+      "id": "uwe_desolate_plunderers",
+      "name": "Desolate Plunderers",
+      "aliases": [
+        "Desolate Plunderers",
+        "데솔레이트 플런더러스",
+        "황량한 약탈자",
+        "Desolate Plunderer King",
+        "Fort Desolation"
+      ],
+      "keywords": [
+        "Shun",
+        "Fort Desolation",
+        "anti-United Cities",
+        "outlaws",
+        "Last Stand"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Desolate Plunderer King",
+      "summary": "Raiders entrenched in Fort Desolation in the Shun region, hostile to the United Cities and any form of law.",
+      "lore": "The Desolate Plunderers have fortified themselves in Fort Desolation in the remote Shun region, far from the reach of United Cities law — which suits them perfectly, as they despise the Empire and the police alike. They are also hostile to any remnants of the Old Empire. Their pacifier operates out of Last Stand, one of the few neutral points in their territory.",
+      "locations": ["Fort Desolation"],
+      "relations": {
+        "United Cities": "hostile",
+        "Police": "hostile",
+        "The Old Empire": "hostile"
+      }
+    },
+    {
+      "id": "uwe_dune_renegades",
+      "name": "Dune Renegades",
+      "aliases": [
+        "Dune Renegades",
+        "듄 레네게이드",
+        "사막 반란군",
+        "Shraff"
+      ],
+      "keywords": [
+        "Great Desert",
+        "Sinkuun",
+        "Spine Canyon",
+        "anti-slavery",
+        "rebels",
+        "Shraff"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "Anti-United Cities rebels roaming the Great Desert, allied with the downtrodden and at war with slavers.",
+      "lore": "The Dune Renegades are a large outlaw faction spread across the Great Desert, Sinkuun, and Spine Canyon. They are committed enemies of the United Cities, the Traders Guild, and the Slave Traders — and equally committed allies of the Rebel Farmers, Empire Peasants, and Hook Raiders. Their settlement of Shraff serves as a base of operations. They share ideological ground with all who resist the Empire's grip on the desert.",
+      "locations": ["Shraff"],
+      "relations": {
+        "United Cities": "hostile",
+        "Traders Guild": "hostile",
+        "Slave Traders": "hostile",
+        "Rebel Farmers": "allied",
+        "Empire Peasants": "allied",
+        "Hook Raiders": "allied",
+        "Shinobi Thieves": "friendly"
+      }
+    },
+    {
+      "id": "uwe_frontier_tamers",
+      "name": "Frontier Tamers",
+      "aliases": [
+        "Frontier Tamers",
+        "프론티어 테이머스",
+        "야생 조련사"
+      ],
+      "keywords": [
+        "animal traders",
+        "Tech Hunters",
+        "exotic animals",
+        "land bat",
+        "leviathan",
+        "spider trader"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "Exotic animal traders allied with the Tech Hunters, dealing in rare creatures like land bats, leviathans, and spiders.",
+      "lore": "Frontier Tamers are a travelling faction of exotic animal traders who work closely with the Tech Hunters. Their traders can be found at dedicated animal trading posts dealing in some of the world's most dangerous creatures — land bats, leviathans, and giant spiders. Their bond with the Tech Hunters suggests they share information about remote regions and the strange wildlife found there.",
+      "locations": ["Animal Trading Posts"],
+      "relations": {
+        "Tech Hunters": "allied"
+      }
+    },
+    {
+      "id": "uwe_green_katanas",
+      "name": "Green Katanas",
+      "aliases": [
+        "Green Katanas",
+        "그린 카타나",
+        "녹색 카타나",
+        "Green Katana Boss",
+        "Green Katana Hideout"
+      ],
+      "keywords": [
+        "The Swamp",
+        "swamp gang",
+        "Green Katana Hideout",
+        "rival gangs"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Green Katana Boss",
+      "summary": "A swamp gang based in Green Katana Hideout, fighting a three-way war against the Swamp Ninjas, Red Sabres, and Blue Cleavers.",
+      "lore": "The Green Katanas are a swamp gang occupying the Green Katana Hideout in the depths of the wetlands. Like the Blue Cleavers, they are locked in conflict on multiple fronts — hostile to the Swamp Ninjas, Red Sabres, and Blue Cleavers simultaneously. They carve out their slice of the swamp through persistent violence, their distinctive green-marked blades a warning to rivals.",
+      "locations": ["Green Katana Hideout"],
+      "relations": {
+        "Swamp Ninjas": "hostile",
+        "Red Sabres": "hostile",
+        "Blue Cleavers": "hostile"
+      }
+    },
+    {
+      "id": "uwe_herdsmen",
+      "name": "Herdsmen",
+      "aliases": [
+        "Herdsmen",
+        "허드즈맨",
+        "목동",
+        "Herdsmen Town"
+      ],
+      "keywords": [
+        "Okran's Valley",
+        "livestock",
+        "Herdsmen Town",
+        "Natives",
+        "pastoral"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "Pastoral herdsmen living in Okran's Valley, in bitter conflict with the indigenous Natives over grazing territory.",
+      "lore": "The Herdsmen are a community of livestock keepers settled in the fertile lands of Okran's Valley. Their presence has brought them into direct conflict with the Natives, the original inhabitants of the valley, who see the Herdsmen's herds as an intrusion on their ancestral lands. This territorial dispute has made the two factions sworn enemies.",
+      "locations": ["Herdsmen Town"],
+      "relations": {
+        "Natives": "hostile"
+      }
+    },
+    {
+      "id": "uwe_highlanders",
+      "name": "Highlanders",
+      "aliases": [
+        "Highlanders",
+        "하이랜더스",
+        "고지인",
+        "Highlanders Prison Camp"
+      ],
+      "keywords": [
+        "Border Zone",
+        "Sho-Battai",
+        "police-aligned",
+        "prison camp",
+        "Okran's Pride",
+        "Stenn Desert"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "A widespread law-aligned faction spanning the Border Zone and Holy Nation frontier, operating prison camps and allied with police.",
+      "lore": "Highlanders are an organised faction that has spread across the Border Zone, Okran's frontier lands, and Stenn Desert. Unlike most factions in these lawless reaches, they are openly aligned with the police and mercenary law-keepers, giving them unusual legitimacy. They operate at least one prison camp and maintain waystation headquarters across their territory. Their pacifier can be found at Sho-Battai.",
+      "locations": ["Highlanders Prison Camp", "Waystation Highlander HQs"],
+      "relations": {
+        "Mercenary Police": "allied",
+        "Police": "allied"
+      }
+    },
+    {
+      "id": "uwe_hill_marauders",
+      "name": "Hill Marauders",
+      "aliases": [
+        "Hill Marauders",
+        "힐 마로더스",
+        "언덕 약탈자",
+        "Hill Marauder King",
+        "Hill Marauder King Tower"
+      ],
+      "keywords": [
+        "Border Zone",
+        "anti-United Cities",
+        "marauders",
+        "hill bandits"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Hill Marauder King",
+      "summary": "Ruthless raiders entrenched in the Border Zone hills, hostile to the United Cities and all forms of law enforcement.",
+      "lore": "The Hill Marauders are a bandit faction controlling the elevated terrain of the Border Zone from the Hill Marauder King Tower. Their king commands raids against United Cities patrols and despises any law enforcement presence in the region. Operating from high ground gives them visibility over a wide area, making them a persistent threat to trade routes and travellers passing through the border territories.",
+      "locations": ["Hill Marauder King Tower"],
+      "relations": {
+        "United Cities": "hostile",
+        "Police": "hostile"
+      }
+    },
+    {
+      "id": "uwe_hiningenteki_hantas",
+      "name": "Hiningenteki Hantas",
+      "aliases": [
+        "Hiningenteki Hantas",
+        "Inhuman Hunters",
+        "히닌겐테키 한타스",
+        "비인간 사냥꾼",
+        "Ashigakari"
+      ],
+      "keywords": [
+        "Border Zone",
+        "Stenn Desert",
+        "Vain",
+        "non-human hunters",
+        "Ashigakari",
+        "xenophobic",
+        "Blister Hill"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "Fanatical non-human hunters operating across the Border Zone, Stenn Desert, and Vain, enemies of all non-human factions.",
+      "lore": "Hiningenteki Hantas — literally 'Inhuman Hunters' — are a zealous faction devoted to exterminating non-human races. From their settlement of Ashigakari, they hunt Shek, Hivers, and Skeletons alike, and have made themselves enemies of Narko's Disciples as well. Their pacifier can be found in Blister Hill, deep in Holy Nation territory — suggesting ideological common ground with the human supremacists there, even if the Holy Nation does not formally endorse them.",
+      "locations": ["Ashigakari"],
+      "relations": {
+        "Shek Kingdom": "hostile",
+        "Western Hive": "hostile",
+        "Skeletons": "hostile",
+        "Narko's Disciples": "hostile"
+      }
+    },
+    {
+      "id": "uwe_hook_raiders",
+      "name": "Hook Raiders",
+      "aliases": [
+        "Hook Raiders",
+        "훅 레이더스",
+        "갈고리 약탈자",
+        "Hooch the Bootlegger",
+        "Kopek"
+      ],
+      "keywords": [
+        "The Hook",
+        "Shun",
+        "anti-slavery",
+        "smugglers",
+        "Kopek",
+        "Shark pacifier"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Hooch the Bootlegger",
+      "summary": "Anti-slavery raiders operating out of The Hook and Shun, allied with all who oppose the United Cities and the slave trade.",
+      "lore": "The Hook Raiders control the settlement of Kopek in the lawless Hook and Shun regions, led by the notorious Hooch the Bootlegger. They are bitter enemies of the United Cities, Traders Guild, and slave traders, and have built a network of alliances with other anti-Empire factions — the Rebel Farmers, Empire Peasants, and Dune Renegades. The Shinobi Thieves also work with them, likely facilitating their smuggling operations.",
+      "locations": ["Kopek"],
+      "relations": {
+        "United Cities": "hostile",
+        "Traders Guild": "hostile",
+        "Slave Traders": "hostile",
+        "Rebel Farmers": "allied",
+        "Empire Peasants": "allied",
+        "Dune Renegades": "allied",
+        "Shinobi Thieves": "friendly"
+      }
+    },
+    {
+      "id": "uwe_mechanical_hive",
+      "name": "Mechanical Hive",
+      "aliases": [
+        "Mechanical Hive",
+        "메카니컬 하이브",
+        "기계 하이브",
+        "Mech Queen",
+        "Mech Hive King"
+      ],
+      "keywords": [
+        "Grey Desert",
+        "Black Desert",
+        "Iron Valleys",
+        "Iron Trail",
+        "mechanical",
+        "hive",
+        "robots"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Mech Queen",
+      "summary": "A unique Hive variant composed of mechanical drones, inhabiting the iron-rich eastern deserts, hostile to the Southern Hive.",
+      "lore": "The Mechanical Hive is a remarkable faction — a Hive colony whose drones are constructed of metal rather than chitin. They have established a presence across the Grey Desert, Black Desert, Iron Valleys, and Iron Trail, territories rich in the metals their unique physiology requires. They are violently opposed to the Southern Hive. Their queen and king can be found at their hive settlements, and their pacifiers operate near Black Desert City and Rusted Ridge.",
+      "locations": ["Mechanical Hive", "Mechanical Hive Village"],
+      "relations": {
+        "Southern Hive": "hostile"
+      }
+    },
+    {
+      "id": "uwe_midland_hive",
+      "name": "Midland Hive",
+      "aliases": [
+        "Midland Hive",
+        "미드랜드 하이브",
+        "중부 하이브",
+        "The Midland Queen",
+        "Midland Hive King"
+      ],
+      "keywords": [
+        "Dreg",
+        "hive",
+        "Mongrel",
+        "Western Hive ally",
+        "Northern Hive ally"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "The Midland Queen",
+      "summary": "A Hive colony in the Dreg region, allied with the Western and Northern Hives and hostile to the Southern Hive.",
+      "lore": "The Midland Hive occupies the swampy Dreg region, forming a Hive settlement under their Queen and King. They maintain strong ties with the Western and Northern Hive colonies, representing a connected network of non-hostile Hive factions standing against the Southern Hive's aggression. Their pacifier can be found in Mongrel, a sign of their willingness to engage with outsiders.",
+      "locations": ["Midland Hive", "Midland Hive Village"],
+      "relations": {
+        "Western Hive": "allied",
+        "Northern Hive": "allied",
+        "Southern Hive": "hostile"
+      }
+    },
+    {
+      "id": "uwe_narkos_disciples",
+      "name": "Narko's Disciples",
+      "aliases": [
+        "Narko's Disciples",
+        "나르코의 제자들",
+        "Narko disciples",
+        "Narko's Refuge",
+        "다크 컬트"
+      ],
+      "keywords": [
+        "Iron Valleys",
+        "Narko",
+        "dark god",
+        "anti-Holy Nation",
+        "Narko's Refuge",
+        "Black Scratch"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "Worshippers of Narko — the dark god the Holy Nation most fears — gathered at Narko's Refuge in the Iron Valleys.",
+      "lore": "Narko's Disciples are devotees of Narko, the dark deity the Holy Nation brands as their supreme evil. They operate from Narko's Refuge in the Iron Valleys, drawing together outcasts, Skeleton sympathisers, and Holy Nation fugitives. Naturally, they are sworn enemies of the Holy Nation and of the Hiningenteki Hantas who hunt non-humans. They find common cause with Skeletons, Holy Nation Outlaws, and Flotsam Ninjas — all persecuted by the Okranites.",
+      "locations": ["Narko's Refuge"],
+      "relations": {
+        "Holy Nation": "hostile",
+        "Hiningenteki Hantas": "hostile",
+        "Skeletons": "friendly",
+        "Holy Nation Outlaws": "friendly",
+        "Flotsam Ninjas": "friendly"
+      }
+    },
+    {
+      "id": "uwe_natives",
+      "name": "Natives",
+      "aliases": [
+        "Natives",
+        "네이티브스",
+        "원주민",
+        "Native Town"
+      ],
+      "keywords": [
+        "Okran's Valley",
+        "indigenous",
+        "Native Town",
+        "Herdsmen conflict",
+        "territorial"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "The indigenous people of Okran's Valley, in constant conflict with the Herdsmen who have encroached on their ancestral lands.",
+      "lore": "The Natives are the original inhabitants of Okran's Valley, living in their own Native Town and following ways of life that predate the Holy Nation's influence in the region. The arrival of the Herdsmen — livestock farmers who see the valley as unclaimed grazing land — has made the two factions bitter enemies, locked in a struggle over who truly owns the valley.",
+      "locations": ["Native Town"],
+      "relations": {
+        "Herdsmen": "hostile"
+      }
+    },
+    {
+      "id": "uwe_northern_hive",
+      "name": "Northern Hive",
+      "aliases": [
+        "Northern Hive",
+        "노던 하이브",
+        "북부 하이브",
+        "The Northern Queen",
+        "Northern Hive King"
+      ],
+      "keywords": [
+        "Sinkuun",
+        "Northern Coast",
+        "hive",
+        "World's End",
+        "Western Hive ally"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "The Northern Queen",
+      "summary": "A Hive colony on the cold Northern Coast and Sinkuun, allied with Western and Midland Hives, hostile to the Southern Hive.",
+      "lore": "The Northern Hive has established its presence on the remote Northern Coast and in Sinkuun, building hive settlements under their Queen and King. They are part of the broader alliance of non-aggressive Hive factions — allied with the Western and Midland Hives — and share their deep enmity toward the Southern Hive. Their pacifier appears at World's End, one of the farthest reaches of the known world.",
+      "locations": ["Northern Hive", "Northern Hive Village"],
+      "relations": {
+        "Western Hive": "allied",
+        "Midland Hive": "allied",
+        "Southern Hive": "hostile"
+      }
+    },
+    {
+      "id": "uwe_savage_hive",
+      "name": "Savage Hive",
+      "aliases": [
+        "Savage Hive",
+        "새비지 하이브",
+        "야만 하이브",
+        "Savage Hive Village"
+      ],
+      "keywords": [
+        "Purple Sands",
+        "hive",
+        "isolated",
+        "Savage Hive Village"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "An isolated Hive colony in the Purple Sands, maintaining no known alliances with other factions.",
+      "lore": "The Savage Hive dwells in the Purple Sands, one of the more remote and inhospitable regions of the world. Unlike other Hive factions, they have formed no known alliances or declared enmities — they exist in isolation, surviving the harsh environment of the Purple Sands on their own terms. Their small village is the only settlement in the area.",
+      "locations": ["Savage Hive Village"],
+      "relations": {}
+    },
+    {
+      "id": "uwe_scorpions",
+      "name": "Scorpions",
+      "aliases": [
+        "Scorpions",
+        "스콜피온스",
+        "전갈단"
+      ],
+      "keywords": [
+        "scorpion",
+        "UWE faction",
+        "hostile"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": null,
+      "summary": "A hostile UWE faction known simply as the Scorpions.",
+      "lore": "The Scorpions are a faction added by the Universal Wasteland Expansion. Little information is documented about their territory or alliances — they are known to be hostile and dangerous, their name suggesting either a desert origin or a connection to the scorpion creatures of the wastelands.",
+      "locations": [],
+      "relations": {}
+    },
+    {
+      "id": "uwe_swamp_ruffians",
+      "name": "Swamp Ruffians",
+      "aliases": [
+        "Swamp Ruffians",
+        "스웜프 러피언스",
+        "늪지 불한당",
+        "Swamp Ruffian King",
+        "Swamp Ruffian King Tower"
+      ],
+      "keywords": [
+        "The Swamp",
+        "South Wetlands",
+        "anti-United Cities",
+        "Flats Lagoon",
+        "ruffians"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Swamp Ruffian King",
+      "summary": "Violent outlaws ruling parts of the Swamp and South Wetlands from the Swamp Ruffian King Tower, hostile to all law.",
+      "lore": "The Swamp Ruffians control a stretch of the Swamp and South Wetlands, operating from the Swamp Ruffian King Tower under their king's authority. They are hostile to the United Cities and any police presence in their territory. Their pacifier can be found at Flats Lagoon, where neutral traders occasionally pass through. They represent yet another layer of criminal power in the already lawless swamp region.",
+      "locations": ["Swamp Ruffian King Tower"],
+      "relations": {
+        "United Cities": "hostile",
+        "Police": "hostile"
+      }
+    },
+    {
+      "id": "uwe_the_bastards",
+      "name": "The Bastards",
+      "aliases": [
+        "The Bastards",
+        "더 배스터즈",
+        "Bastard King",
+        "Bastion Overlook",
+        "Bast"
+      ],
+      "keywords": [
+        "Bast",
+        "Bastion Overlook",
+        "anti-United Cities",
+        "anti-Holy Nation",
+        "outlaw",
+        "World's End pacifier"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Bastard King",
+      "summary": "Outlaws fortified at Bastion Overlook in the Bast region, enemies of the United Cities, Holy Nation, and any lawful authority.",
+      "lore": "The Bastards hold Bastion Overlook in the Bast region under the Bastard King. They have made enemies of nearly every lawful power — the United Cities, the Holy Nation, the police, and the remnants of the Old Empire — as well as the nearby Deadcat fishing communities. They represent pure defiance of all established order. Travellers can contact their pacifier at World's End.",
+      "locations": ["Bastion Overlook"],
+      "relations": {
+        "United Cities": "hostile",
+        "Holy Nation": "hostile",
+        "Police": "hostile",
+        "The Old Empire": "hostile",
+        "Deadcat": "hostile"
+      }
+    },
+    {
+      "id": "uwe_the_deluged",
+      "name": "The Deluged",
+      "aliases": [
+        "The Deluged",
+        "더 딜루지드",
+        "침수된 자들",
+        "Deluged King",
+        "Flooded Oasis"
+      ],
+      "keywords": [
+        "Floodlands",
+        "Flooded Oasis",
+        "anti-United Cities",
+        "anti-Holy Nation",
+        "Cannibals hostile",
+        "World's End pacifier"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Deluged King",
+      "summary": "Survivors inhabiting the flooded ruins of the Floodlands, enemies of nearly every major power including the Cannibals.",
+      "lore": "The Deluged have adapted to life in the Flooded Oasis and the surrounding Floodlands — a waterlogged territory that most factions avoid. Their king leads a community hardened by isolation and constant threat: they are hostile to the United Cities, Holy Nation, Cannibals, and the police alike. Even the Deadcat communities nearby regard them with suspicion. Their pacifier can be found at World's End.",
+      "locations": ["Flooded Oasis"],
+      "relations": {
+        "United Cities": "hostile",
+        "Holy Nation": "hostile",
+        "Police": "hostile",
+        "Cannibals": "hostile",
+        "The Old Empire": "hostile",
+        "Deadcat": "hostile"
+      }
+    },
+    {
+      "id": "uwe_the_scorched_ones",
+      "name": "The Scorched Ones",
+      "aliases": [
+        "The Scorched Ones",
+        "더 스코치드 원스",
+        "불탄 자들",
+        "Scorched One King",
+        "Scorched Outpost",
+        "Burning Forest"
+      ],
+      "keywords": [
+        "Burning Forest",
+        "Scorched Outpost",
+        "anti-United Cities",
+        "anti-Holy Nation",
+        "fire",
+        "Black Desert City pacifier"
+      ],
+      "source_mod": "UWE",
+      "is_major": false,
+      "leader": "Scorched One King",
+      "summary": "Survivors of the Burning Forest, scarred and hostile, operating from Scorched Outpost against all major powers.",
+      "lore": "The Scorched Ones haunt the Burning Forest — a region of perpetual fire and ash — operating from Scorched Outpost under their king. Whatever created them or drove them here has left them deeply hostile to the United Cities, the Holy Nation, and any police presence. Their pacifier can be found near Black Desert City, one of the few places where cautious contact is possible.",
+      "locations": ["Scorched Outpost"],
+      "relations": {
+        "United Cities": "hostile",
+        "Holy Nation": "hostile",
+        "Police": "hostile"
+      }
+    }
+  ]
+}

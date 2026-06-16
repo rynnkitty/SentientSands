@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "_README": "세력정보.txt 기반 바닐라 미수록 17개 팩션. 정제(게임팁 제거) → 영문 번역 → 스키마화 파이프라인 적용. 2026-06-16",
+  "factions": [
+    {
+      "id": "united_heroes_league",
+      "name": "United Heroes League",
+      "aliases": [
+        "United Heroes League",
+        "UHL",
+        "연합 영웅 연맹",
+        "영웅 연맹",
+        "Lord Mirage",
+        "로드 미라지"
+      ],
+      "keywords": [
+        "human supremacy",
+        "protection racket",
+        "Fort Mirage",
+        "Great Desert",
+        "xenophobia",
+        "thugs"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Lord Mirage",
+      "summary": "Human-supremacist gang extorting travelers and brutalizing non-humans in the Great Desert.",
+      "lore": "The United Heroes League are self-styled 'heroes' — in truth, a gang of human supremacists operating in the Great Desert under the feeble Lord Mirage. They extort protection money from passersby and viciously harass or attack any non-human they encounter outside city limits. Shek, Skeletons, and Hivers are their favourite targets. Even the United Cities regards them as an embarrassment. Their base, Fort Mirage, is a pathetic single building in the middle of the desert.",
+      "locations": ["Fort Mirage"],
+      "relations": {
+        "United Cities": "tolerated/disliked",
+        "Traders Guild": "occasionally hired"
+      }
+    },
+    {
+      "id": "twinblades",
+      "name": "Twinblades",
+      "aliases": [
+        "Twinblades",
+        "쌍칼단",
+        "Big Fang",
+        "왕초 팽"
+      ],
+      "keywords": [
+        "swamp gang",
+        "kidnapping",
+        "organ trafficking",
+        "Shark",
+        "Mud Town",
+        "The Swamp"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Big Fang",
+      "summary": "The smallest and most sinister of the five Swamp gangs, notorious for kidnapping and organ trafficking.",
+      "lore": "Twinblades are the shadiest of the five gangs that rule the Swamp, operating out of Shark and Mud Town. Unlike the other gangs who run smuggling or drug operations, Twinblades are rumoured to deal in kidnapping and organ trafficking. Their boss Big Fang commands little real respect even among the other swamp gangs, and the Twinblades maintain no permanent base of their own.",
+      "locations": ["Shark", "Mud Town"],
+      "relations": {
+        "The Hounds": "allied",
+        "Blackshifters": "allied",
+        "Grayflayers": "allied",
+        "Stone Rats": "allied"
+      }
+    },
+    {
+      "id": "slave_hunters",
+      "name": "Slave Hunters",
+      "aliases": [
+        "Slave Hunters",
+        "추노꾼",
+        "노예 사냥꾼"
+      ],
+      "keywords": [
+        "slavery",
+        "bounty",
+        "capture",
+        "slave catchers",
+        "escaped slaves"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Poorly equipped slave-catchers who roam the land capturing escaped slaves and unconscious travellers.",
+      "lore": "Slave Hunters are the lower-tier equivalent of Manhunters — lightly armed thugs who patrol looking for escaped slaves to return to their owners. They will attack weakened or unconscious individuals on sight, declaring them escaped property. Unlike Manhunters they are poorly geared and lack experience, making them less dangerous in open confrontation.",
+      "locations": [],
+      "relations": {
+        "Slave Traders": "allied",
+        "Manhunters": "allied"
+      }
+    },
+    {
+      "id": "shrieking_bandits",
+      "name": "Shrieking Bandits",
+      "aliases": [
+        "Shrieking Bandits",
+        "울부짖는 도적단",
+        "울부짖는 도적",
+        "Shrieking Forest"
+      ],
+      "keywords": [
+        "Shrieking Forest",
+        "mad nomads",
+        "butcher knives",
+        "naked",
+        "toxic gas",
+        "insane",
+        "울부짖는 숲"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Naked, howling madmen who swarm the Shrieking Forest, driven insane by the region's toxic fumes.",
+      "lore": "The Shrieking Bandits haunt the Shrieking Forest in the far west, moving constantly at a run and communicating only in unintelligible wails. They wear no armour and carry nothing but butcher knives, yet their sheer numbers make them terrifying. Scholars believe they were once nomads driven permanently mad by toxic gases seeping from the forest floor. They do not harm fallen enemies — they simply move on, screaming.",
+      "locations": ["Shrieking Forest"],
+      "relations": {
+        "Nomads": "friendly"
+      }
+    },
+    {
+      "id": "empire_peasants",
+      "name": "Empire Peasants",
+      "aliases": [
+        "Empire Peasants",
+        "제국의 천민",
+        "제국 농부",
+        "UC peasants",
+        "천민"
+      ],
+      "keywords": [
+        "United Cities",
+        "poverty",
+        "underclass",
+        "slums",
+        "escaped slaves",
+        "rebellion"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "The desperate underclass of the United Cities — the poor, escaped slaves, and those made criminals by poverty.",
+      "lore": "Empire Peasants are the forgotten underclass of the United Cities, living in slums on the margins of the Empire's cities. In the United Cities, poverty itself is a crime, so these people exist in constant fear of arrest. Many are escaped slaves with bounties on their heads. They are ignored or brutalised by the city guards who enforce noble law. If the United Cities' ruling nobles are overthrown, it is these people who move in to fill the power vacuum.",
+      "locations": [],
+      "relations": {
+        "United Cities": "hostile",
+        "Rebel Farmers": "friendly",
+        "Anti-Slavers": "friendly"
+      }
+    },
+    {
+      "id": "rebel_swordsmen",
+      "name": "Rebel Swordsmen",
+      "aliases": [
+        "Rebel Swordsmen",
+        "반란군 검객",
+        "반란 검객"
+      ],
+      "keywords": [
+        "United Cities collapse",
+        "militia",
+        "Empire Peasants",
+        "Rebel Farmers",
+        "post-collapse"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Militia forces that emerge to defend cities taken over by Empire Peasants after the United Cities collapses.",
+      "lore": "Rebel Swordsmen are armed militia who appear when the United Cities begins to fall and its cities pass into the hands of the Empire Peasants. Essentially a militarised extension of the peasant class, they serve as guards and defenders for the liberated cities. They share allegiances with the Rebel Farmers, and the two factions recognise each other as part of the same broader uprising against noble rule.",
+      "locations": [],
+      "relations": {
+        "Rebel Farmers": "allied",
+        "Empire Peasants": "allied",
+        "United Cities": "hostile"
+      }
+    },
+    {
+      "id": "bounty_hunters",
+      "name": "Bounty Hunters",
+      "aliases": [
+        "Bounty Hunters",
+        "현상금 사냥꾼",
+        "현상금 사냥꾼들"
+      ],
+      "keywords": [
+        "bounty",
+        "wanted criminals",
+        "mercenary",
+        "roaming",
+        "warrant"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Professional hunters who roam the entire continent tracking down wanted criminals for bounty payments.",
+      "lore": "Bounty Hunters operate across the whole of Kenshi, pursuing anyone with an active warrant or bounty posted against them. They work independently rather than for any single faction, accepting contracts from Holy Nation, United Cities, Shek Kingdom, or anyone else willing to pay. A Bounty Hunter who spots a target will announce their intentions — go quietly or go hard — before closing in for capture.",
+      "locations": [],
+      "relations": {}
+    },
+    {
+      "id": "deadcat",
+      "name": "Deadcat",
+      "aliases": [
+        "Deadcat",
+        "데드캣",
+        "Deadcat fishermen",
+        "어촌 세력"
+      ],
+      "keywords": [
+        "fishing villages",
+        "north coast",
+        "cannibals",
+        "Holy Nation refugees",
+        "ruins",
+        "decline"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "A once-great faction reduced to scattered fishing villages after their capital was overrun by Cannibals.",
+      "lore": "Deadcat were once a significant power, but their main city was taken by Cannibals long ago and they never recovered. Now they survive as a handful of poor fishing villages clinging to the northern coast. Records suggest they were originally Holy Nation refugees who settled near Cannibal territory, vastly underestimating the threat. Even if the Cannibal leadership is destroyed, Deadcat lacks the strength or will to reclaim their lost city.",
+      "locations": [],
+      "relations": {
+        "Cannibals": "hostile",
+        "Holy Nation": "historical origin"
+      }
+    },
+    {
+      "id": "mercenary_guild",
+      "name": "Mercenary Guild",
+      "aliases": [
+        "Mercenary Guild",
+        "용병 연합",
+        "용병 길드",
+        "Mercenaries",
+        "용병"
+      ],
+      "keywords": [
+        "mercenaries",
+        "hire",
+        "bar",
+        "combat",
+        "soldiers for hire",
+        "freelance"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": null,
+      "summary": "Professional soldiers-for-hire found in bars across the world, willing to fight for any employer.",
+      "lore": "The Mercenary Guild operates out of bars and inns across Kenshi, offering their blades to anyone who can pay. Squad captains lead mixed groups of human and Shek fighters. They ask no questions about who the enemy is — they will fight Holy Nation, United Cities, or outlaws alike. This reputation for impartiality means their guild-wide standing can shift if clients drag them into the wrong fights.",
+      "locations": [],
+      "relations": {}
+    },
+    {
+      "id": "band_of_bones",
+      "name": "Band of Bones",
+      "aliases": [
+        "Band of Bones",
+        "뼈의 부대",
+        "뼈 무리",
+        "Exile Camp",
+        "Tora the Fearless",
+        "겁없는 토라"
+      ],
+      "keywords": [
+        "Shek exiles",
+        "outlaws",
+        "Exile Camp",
+        "Squin",
+        "challenge",
+        "aggressive"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Tora the Fearless",
+      "summary": "Shek outlaws banished from the Shek Kingdom, living in the Exile Camp south of Squin and spoiling for a fight.",
+      "lore": "The Band of Bones are Shek criminals cast out from the Shek Kingdom, making their home in the Exile Camp south of Squin. True to Shek nature, they are aggressive and restless — they will challenge any armed traveller they meet, and any outsider who builds in Shek territory will find them arriving to demand the land. They speak of battle with enthusiasm, taunting enemies before attacks. Their leader, Tora the Fearless, carries a bounty from the Shek Kingdom.",
+      "locations": ["Exile Camp"],
+      "relations": {
+        "Shek Kingdom": "hostile (exiles)",
+        "United Cities": "hostile"
+      }
+    },
+    {
+      "id": "skeleton_bandits",
+      "name": "Skeleton Bandits",
+      "aliases": [
+        "Skeleton Bandits",
+        "스켈레톤 도적단",
+        "Iron HQ",
+        "The Crags",
+        "Elder",
+        "장로"
+      ],
+      "keywords": [
+        "Skeleton supremacy",
+        "brainwashed humans",
+        "Skeleton masks",
+        "Iron HQ",
+        "The Crags",
+        "anti-human"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Elder",
+      "summary": "A Skeleton-supremacist cult whose only true Skeleton is the Elder — the rest are brainwashed humans in Skeleton masks.",
+      "lore": "The Skeleton Bandits occupy Iron HQ in the rocky crags of the south, led by a Skeleton called the Elder. Their ideology holds that Skeletons are the master race and humanity their creation — destined for destruction. Ironically, nearly every member is a human who has been convinced they are a Skeleton, wearing crude masks and carrying only Skeleton repair kits. They attack outsiders on sight, yet a Skeleton visitor will be met with respect and offered alliance.",
+      "locations": ["Iron HQ", "The Crags"],
+      "relations": {
+        "Southern Hive": "hostile (takes over if Elder dies)",
+        "Skeletons": "admired"
+      }
+    },
+    {
+      "id": "red_sabres",
+      "name": "Red Sabres",
+      "aliases": [
+        "Red Sabres",
+        "붉은 세이버",
+        "Red Sabre Boss",
+        "붉은 기병대",
+        "붉은 기병대 보스"
+      ],
+      "keywords": [
+        "The Swamp",
+        "bandits",
+        "Red Sabres hideout",
+        "swamp raiders"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Red Sabre Boss",
+      "summary": "A bandit gang raiding out of the Swamp, one of the many dangers travellers face in that lawless region.",
+      "lore": "The Red Sabres are a raider gang based in the Swamp, operating from the Red Sabre Hideout deep in the wetlands. They are one of several hostile factions competing for dominance in that dangerous region alongside the Swamp Ninjas and the five swamp gangs. Compared to more organised outfits, they are rough brigands — veterans of the swamp who wear real armour and know the terrain.",
+      "locations": ["Red Sabre Hideout"],
+      "relations": {
+        "Swamp Ninjas": "hostile",
+        "The Hounds": "hostile"
+      }
+    },
+    {
+      "id": "preacher_cult",
+      "name": "Preacher Cult",
+      "aliases": [
+        "Preacher Cult",
+        "광신교 설교사",
+        "Preacher",
+        "설교사",
+        "moon worshippers",
+        "달 숭배자"
+      ],
+      "keywords": [
+        "Black Scratch",
+        "moon cult",
+        "sacrifice",
+        "farming village",
+        "fanatics",
+        "blood ritual"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Preacher",
+      "summary": "A fanatical farming village near Black Scratch that sacrifices outsiders as blood offerings to the moon god.",
+      "lore": "The Preacher Cult operates out of what appears to be an ordinary farming village near Black Scratch. In truth, they are devoted moon-worshippers who believe spilling the blood of outsiders brings divine favour and good harvests. Every member carries a moon cleaver and will attack any stranger who enters their territory. They are one of the few groups in Kenshi that actively execute downed enemies. The Preacher leads their rituals and is wanted by all three major powers.",
+      "locations": ["Preacher Village (near Black Scratch)"],
+      "relations": {
+        "Holy Nation": "hostile",
+        "United Cities": "hostile",
+        "Shek Kingdom": "hostile"
+      }
+    },
+    {
+      "id": "thrall_masters",
+      "name": "Thrall Masters",
+      "aliases": [
+        "Thrall Masters",
+        "노비 주인",
+        "Tower of Abuse",
+        "학대의 탑",
+        "Screamer the False",
+        "위선자 스크리머",
+        "Ponk",
+        "퐁크",
+        "Venge"
+      ],
+      "keywords": [
+        "Venge",
+        "Skeleton kidnappers",
+        "Tower of Abuse",
+        "headless Skeletons",
+        "experiments",
+        "복수의 협곡"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Screamer the False",
+      "summary": "Skeleton bandits in the Venge who abduct other Skeletons, remove their heads, and use them as mindless thralls.",
+      "lore": "The Thrall Masters control the Tower of Abuse in the hazardous orbital-beam wasteland of Venge. Their leaders — Screamer the False and Ponk — kidnap stray Skeletons, surgically remove their heads, and rebuild them as lobotomised servants. Their territory is exposed to the ancient orbital mirror beams that pulse across Venge during daylight hours, making any assault a dangerous undertaking. A rare intact Skeleton named Agnu is held captive within the tower.",
+      "locations": ["Tower of Abuse", "Venge"],
+      "relations": {
+        "Holy Nation": "hostile",
+        "United Cities": "hostile"
+      }
+    },
+    {
+      "id": "gorillo_bandits",
+      "name": "Gorillo Bandits",
+      "aliases": [
+        "Gorillo Bandits",
+        "고릴로 도적",
+        "Gorillo",
+        "고릴로"
+      ],
+      "keywords": [
+        "gorillo mimics",
+        "unarmed combat",
+        "martial arts",
+        "ape behaviour",
+        "Gorillo"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Gorillo",
+      "summary": "A bandit gang who mimic Gorillo animals, fighting almost entirely unarmed — led by an abnormally huge and powerful chief.",
+      "lore": "The Gorillo Bandits are a peculiar outlaw group who have modelled themselves after the wild Gorillo animals — moving with ape-like gaits and referring to enemies as 'little ones'. Nearly all members fight bare-handed with martial arts rather than weapons. Their hulking chief, simply called Gorillo, is a genuine physical monster who alone carries a blade. He is wanted by both the Shek Kingdom and United Cities for a significant bounty.",
+      "locations": [],
+      "relations": {
+        "Shek Kingdom": "hostile",
+        "United Cities": "hostile"
+      }
+    },
+    {
+      "id": "krals_chosen",
+      "name": "Kral's Chosen",
+      "aliases": [
+        "Kral's Chosen",
+        "크랄의 결사대",
+        "크랄의 선택받은 자들",
+        "Flying Bull",
+        "하늘을 나는 황소",
+        "Shek supremacists"
+      ],
+      "keywords": [
+        "Shek supremacy",
+        "Esata rebels",
+        "old Shek ways",
+        "greatswords",
+        "King Shager",
+        "셰크 우월주의"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Flying Bull",
+      "summary": "Shek supremacists who rejected Queen Esata's peace and withdrew to wage war on all non-Shek, led by the warrior Flying Bull.",
+      "lore": "Kral's Chosen are Shek warriors who refused to accept Queen Esata's policy of peace and openness. They hold to the old ways of King Shager — the belief that Shek are superior and all others are enemies. Their leader, Flying Bull, was once a legendary warrior of the Shek Kingdom. They roam Shek territory attacking any non-Shek on sight and represent everything the current Shek leadership is trying to move beyond.",
+      "locations": [],
+      "relations": {
+        "Shek Kingdom": "hostile",
+        "Holy Nation": "hostile",
+        "United Cities": "hostile"
+      }
+    },
+    {
+      "id": "spiders",
+      "name": "Spiders",
+      "aliases": [
+        "Spiders",
+        "거미",
+        "거미들",
+        "Bugmaster",
+        "벌레의 왕",
+        "Arakhu",
+        "아라크"
+      ],
+      "keywords": [
+        "Bugmaster",
+        "Arakhu",
+        "spider army",
+        "ancient mystery",
+        "Shek enemy",
+        "blood spiders",
+        "leviathan spiders"
+      ],
+      "source_mod": "vanilla",
+      "is_major": false,
+      "leader": "Bugmaster",
+      "summary": "A vast army of spiders commanded by the ancient and mysterious Bugmaster from his fortress at Arakhu.",
+      "lore": "The Spiders are a massive swarm led by the enigmatic Bugmaster — a lone human who has somehow lived for centuries and commands the creatures of Arakhu with uncanny authority. The Shek Kingdom has been at war with his spider legions for over a hundred years, placing their highest bounty on his head. No one knows the Bugmaster's true origins or how he controls the spiders. His sealed chamber holds only a map pointing to the Ashlands and hundreds of human teeth — evidence of some ancient purpose no one has yet deciphered.",
+      "locations": ["Arakhu"],
+      "relations": {
+        "Shek Kingdom": "hostile (century-long war)",
+        "United Cities": "hostile"
+      }
+    }
+  ]
+}
