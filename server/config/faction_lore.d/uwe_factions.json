@@ -74,7 +74,7 @@
       "is_major": false,
       "leader": "Blue Cleaver Boss",
       "summary": "A swamp gang operating from the Blue Cleaver Hideout, locked in conflict with every other major swamp faction.",
-      "lore": "The Blue Cleavers are a swamp gang making their base at the Blue Cleaver Hideout deep in the wetlands. They are at war with every major rival in the region — the Swamp Ninjas, the Red Sabres, and the Green Katanas. This constant multi-front conflict defines their existence. Unlike the older five swamp gangs, the Blue Cleavers are a newer presence willing to carve out their own territory by force.",
+      "lore": "The Blue Cleavers are a swamp gang making their base at the Blue Cleaver Hideout deep in the wetlands. They are at war with every major rival in the region — the Swamp Ninjas, the Red Sabres, and the Green Katanas. This constant multi-front conflict defines their existence. They carve out their territory through persistent violence, fighting on all sides at once.",
       "locations": ["Blue Cleaver Hideout"],
       "relations": {
         "Swamp Ninjas": "hostile",
@@ -108,7 +108,8 @@
       "relations": {
         "United Cities": "hostile",
         "Police": "hostile",
-        "The Old Empire": "hostile"
+        "The Old Empire": "hostile",
+        "Outlaw": "unfriendly"
       }
     },
     {
@@ -190,7 +191,7 @@
       "is_major": false,
       "leader": "Green Katana Boss",
       "summary": "A swamp gang based in Green Katana Hideout, fighting a three-way war against the Swamp Ninjas, Red Sabres, and Blue Cleavers.",
-      "lore": "The Green Katanas are a swamp gang occupying the Green Katana Hideout in the depths of the wetlands. Like the Blue Cleavers, they are locked in conflict on multiple fronts — hostile to the Swamp Ninjas, Red Sabres, and Blue Cleavers simultaneously. They carve out their slice of the swamp through persistent violence, their distinctive green-marked blades a warning to rivals.",
+      "lore": "The Green Katanas are a swamp gang occupying the Green Katana Hideout in the depths of the wetlands. Like the Blue Cleavers, they are locked in conflict on multiple fronts — hostile to the Swamp Ninjas, Red Sabres, and Blue Cleavers simultaneously. They carve out their slice of the swamp through persistent violence, with enemies pressing in on all sides.",
       "locations": ["Green Katana Hideout"],
       "relations": {
         "Swamp Ninjas": "hostile",
@@ -302,7 +303,7 @@
       "is_major": false,
       "leader": null,
       "summary": "Fanatical non-human hunters operating across the Border Zone, Stenn Desert, and Vain, enemies of all non-human factions.",
-      "lore": "Hiningenteki Hantas — literally 'Inhuman Hunters' — are a zealous faction devoted to exterminating non-human races. From their settlement of Ashigakari, they hunt Shek, Hivers, and Skeletons alike, and have made themselves enemies of Narko's Disciples as well. Their pacifier can be found in Blister Hill, deep in Holy Nation territory — suggesting ideological common ground with the human supremacists there, even if the Holy Nation does not formally endorse them.",
+      "lore": "Hiningenteki Hantas — literally 'Inhuman Hunters' — are a zealous faction devoted to exterminating non-human races. From their settlement of Ashigakari, they hunt Shek, Western Hive Hivers, and Skeletons alike, and have made themselves enemies of Narko's Disciples as well. Their pacifier can be found in Blister Hill, deep in Holy Nation territory — suggesting ideological common ground with the human supremacists there, even if the Holy Nation does not formally endorse them.",
       "locations": ["Ashigakari"],
       "relations": {
         "Shek Kingdom": "hostile",
@@ -366,7 +367,7 @@
       ],
       "source_mod": "UWE",
       "is_major": false,
-      "leader": "Mech Queen",
+      "leader": "Mech Queen / Mech Hive King",
       "summary": "A unique Hive variant composed of mechanical drones, inhabiting the iron-rich eastern deserts, hostile to the Southern Hive.",
       "lore": "The Mechanical Hive is a remarkable faction — a Hive colony whose drones are constructed of metal rather than chitin. They have established a presence across the Grey Desert, Black Desert, Iron Valleys, and Iron Trail, territories rich in the metals their unique physiology requires. They are violently opposed to the Southern Hive. Their queen and king can be found at their hive settlements, and their pacifiers operate near Black Desert City and Rusted Ridge.",
       "locations": ["Mechanical Hive", "Mechanical Hive Village"],
@@ -393,7 +394,7 @@
       ],
       "source_mod": "UWE",
       "is_major": false,
-      "leader": "The Midland Queen",
+      "leader": "The Midland Queen / Midland Hive King",
       "summary": "A Hive colony in the Dreg region, allied with the Western and Northern Hives and hostile to the Southern Hive.",
       "lore": "The Midland Hive occupies the swampy Dreg region, forming a Hive settlement under their Queen and King. They maintain strong ties with the Western and Northern Hive colonies, representing a connected network of non-hostile Hive factions standing against the Southern Hive's aggression. Their pacifier can be found in Mongrel, a sign of their willingness to engage with outsiders.",
       "locations": ["Midland Hive", "Midland Hive Village"],
@@ -409,9 +410,9 @@
       "aliases": [
         "Narko's Disciples",
         "나르코의 제자들",
+        "나르코 추종자",
         "Narko disciples",
-        "Narko's Refuge",
-        "다크 컬트"
+        "Narko's Refuge"
       ],
       "keywords": [
         "Iron Valleys",
@@ -480,7 +481,7 @@
       ],
       "source_mod": "UWE",
       "is_major": false,
-      "leader": "The Northern Queen",
+      "leader": "The Northern Queen / Northern Hive King",
       "summary": "A Hive colony on the cold Northern Coast and Sinkuun, allied with Western and Midland Hives, hostile to the Southern Hive.",
       "lore": "The Northern Hive has established its presence on the remote Northern Coast and in Sinkuun, building hive settlements under their Queen and King. They are part of the broader alliance of non-aggressive Hive factions — allied with the Western and Midland Hives — and share their deep enmity toward the Southern Hive. Their pacifier appears at World's End, one of the farthest reaches of the known world.",
       "locations": ["Northern Hive", "Northern Hive Village"],
@@ -591,6 +592,7 @@
         "Holy Nation": "hostile",
         "Police": "hostile",
         "The Old Empire": "hostile",
+        "Outlaw": "unfriendly",
         "Deadcat": "hostile"
       }
     },
@@ -624,6 +626,7 @@
         "Police": "hostile",
         "Cannibals": "hostile",
         "The Old Empire": "hostile",
+        "Outlaw": "unfriendly",
         "Deadcat": "hostile"
       }
     },
@@ -635,8 +638,7 @@
         "더 스코치드 원스",
         "불탄 자들",
         "Scorched One King",
-        "Scorched Outpost",
-        "Burning Forest"
+        "Scorched Outpost"
       ],
       "keywords": [
         "Burning Forest",
