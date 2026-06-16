@@ -30,8 +30,8 @@ Kenshi의 대화 시스템을 통째로 LLM에 연결합니다. 게임 내 **누
 **개조판 추가 기능** (상세는 [개조판 추가 기능](#개조판-추가-기능) 참조)
 
 - **기억 3계층 강화** — 단기(20줄) + 중기 Digest(자동 요약) + 아카이브 압축 + 장기 Durable Memory(NPC 자율 기록)
-- **팩션 RAG** — 대화 내용에서 팩션을 퍼지+시맨틱 매칭으로 감지해 해당 로어만 주입. 커스텀 모드 팩션도 JSON 드롭인으로 추가 가능
-- **월드 로어 청크 RAG** — world_lore.txt를 주제별 청크로 분할, 대화 관련 청크만 선택 주입 (~50% 토큰 절감)
+- **팩션 RAG** — 대화 내용에서 팩션을 퍼지+시맨틱 매칭으로 감지해 해당 로어만 주입. 바닐라 50개 + UWE 23개 = **총 73개 팩션** 수록. UWE 팩션은 `[UWE]` 레이블로 출처 구분. 커스텀 모드 팩션도 JSON 드롭인으로 추가 가능
+- **월드 로어 청크 RAG** — world_lore.txt를 주제별 청크로 분할, 대화 관련 청크만 선택 주입 (~50% 토큰 절감). 기본 **8개 청크** (바닐라 5 + UWE 3)
 - **SQLite 하이브리드 스토리지** — 프로파일은 JSON(사용자 직접 편집 가능) / 대화 이력·기억은 SQLite DB로 분리 관리
 - **벡터 기반 기억 회상** — sqlite-vec KNN으로 키워드 없이 의미 기반으로 장기 기억 회상
 - **프롬프트 최적화** — 첫 대화 프롬프트 약 3,300~3,600토큰 (한글 기준 실제 API ~5,000토큰 이내)
@@ -206,9 +206,14 @@ Kenshi의 대화 시스템을 통째로 LLM에 연결합니다. 게임 내 **누
 
 ### 2. 커스텀 팩션 로어 추가 (팩션 RAG)
 
-기본 DB(`server/config/faction_lore.json`)에 바닐라 33개 팩션이 수록되어 있습니다.
-UWE 등 **모드 추가 팩션**은 `server/config/faction_lore.d/` 폴더에 `*.json` 파일을 떨어뜨리면
+기본 DB에 **바닐라 50개 + UWE 23개 = 총 73개 팩션**이 수록되어 있습니다.
+- `server/config/faction_lore.json` — 바닐라 메이저/마이너 33개 (원작 수록)
+- `server/config/faction_lore.d/vanilla_missing_factions.json` — 바닐라 미수록 17개 (세력정보.txt 기반)
+- `server/config/faction_lore.d/uwe_factions.json` — UWE 모드 신규 23개
+
+추가 **모드 팩션**은 `server/config/faction_lore.d/` 폴더에 `*.json` 파일을 떨어뜨리면
 서버 시작 시(또는 실행 중 `http://127.0.0.1:5000/lore/reload` 호출 시) 자동 병합됩니다.
+`source_mod` 필드를 모드 이름으로 설정하면 프롬프트에 `[모드명]` 레이블이 자동 출력됩니다.
 
 ```jsonc
 {
@@ -376,8 +381,9 @@ server\python\python.exe server\scripts\embed_existing_memories.py [캠페인명
 <details>
 <summary><b>월드 로어 청크 RAG</b> — world_lore.txt를 주제별 청크로 분할, 관련 청크만 주입</summary>
 
-`server/config/world_lore_chunks.json`에 세계관을 주제별 청크(기본 5개)로 분리합니다.
+`server/config/world_lore_chunks.json`에 세계관을 주제별 청크(기본 **8개** — 바닐라 5 + UWE 3)로 분리합니다.
 `/chat` 요청마다 대화 쿼리와 코사인 유사도를 계산해 관련성 높은 청크(기본 top-2)만 주입합니다.
+각 청크에 `"source"` 필드를 설정하면 vanilla 이외의 출처에는 `[SOURCE]` 접두사가 붙습니다.
 
 - 임베딩 모델 로딩 전에는 `always_include: true` 청크만 주입해 안전하게 폴백
 - `world_lore_chunks.json`이 없으면 기존 `world_lore.txt` 전체 주입으로 자동 폴백
@@ -565,6 +571,21 @@ INI에 키가 없으면 기본값으로 동작합니다 (하위 호환). F8 → 
 **Q. 설정을 INI에서 직접 바꿨는데 적용이 안 됩니다**
 - 게임(서버) 실행 중 INI 직접 수정은 권장하지 않습니다 — F8 메뉴를 쓰거나 게임 재시작.
   단, 팩션 로어 JSON과 월드 로어 청크 JSON은 실행 중 수정 후 `/lore/reload`로 즉시 반영 가능합니다.
+
+---
+
+## 변경 이력
+
+### 2026-06-16 — 로어 RAG 확장 (바닐라 + UWE 통합)
+
+**팩션 DB 33 → 73개로 확장**
+
+| Phase | 내용 |
+|-------|------|
+| A | `_format_faction_intel()` — `source_mod` 값이 vanilla가 아니면 `[모드명]` 레이블 자동 출력. `world_lore_chunks.json`에 `"source"` 필드 추가 |
+| B | `faction_lore.d/vanilla_missing_factions.json` — 세력정보.txt(한국어 위키) 기반 바닐라 미수록 17개 팩션. 정제(게임팁 제거) → 영문 번역(150tk 이내) → 스키마화 파이프라인 적용 |
+| C | `faction_lore.d/uwe_factions.json` — UWE_Info.md §6~8 기반 UWE 모드 신규 23개 팩션. biome·관계도·거점 데이터 기반 로어 작성 |
+| D | `world_lore_chunks.json` — UWE 세계 청크 3개 추가: 신규 적대 세력 거점 / 신규 하이브 변종 / 팩션 외교관 위치 |
 
 ---
 
