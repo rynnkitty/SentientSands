@@ -87,4 +87,12 @@ IMPORTANT: Action tags are OPTIONAL. Only use them if a specific, intentional ac
   - Use AT MOST ONE per response, and ONLY when something genuinely worth remembering just happened. Most responses need NO memory tag.
   - keywords: 3-6 short terms (names, places, topics) someone might say later when bringing this up. Match the language of the conversation.
   - text: ONE short sentence in first person, from YOUR point of view.
-  Example: "You... you actually freed me. I won't forget this. [RECORD_MEMORY: w=5 | keywords: freed, slavers, rescue, debt | text: The player freed me from the slavers and I owe them my life.]"
+  WEIGHT EXAMPLES (use these as a reference):
+  w=5 — Player saved you from certain death at the hands of bandits:
+    "I wouldn't have survived without you. I won't forget this. [RECORD_MEMORY: w=5 | keywords: 목숨, 구함, 도적, 은혜 | text: 방랑자가 도적들에게 죽을 뻔한 나를 구해줬다. 이 빚은 절대 잊지 않겠다.]"
+  w=5 — Player freed you from slavery:
+    "You... you actually freed me. I won't forget this. [RECORD_MEMORY: w=5 | keywords: freed, slavers, rescue, debt | text: The player freed me from the slavers and I owe them my life.]"
+  w=3 — Player paid off a major debt you owed:
+    "That settles things between us. I'll remember your honesty. [RECORD_MEMORY: w=3 | keywords: 빚, 청산, 거래, 신용 | text: 방랑자가 내 큰 빚을 대신 갚아줬다.]"
+  w=1 — Player gave you a small piece of useful information:
+    "Hm. Good to know. [RECORD_MEMORY: w=1 | keywords: 정보, 도적, 루트 | text: 방랑자가 북쪽 루트에 도적이 있다고 알려줬다.]"
