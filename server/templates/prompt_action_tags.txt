@@ -62,9 +62,27 @@ IMPORTANT: Action tags are OPTIONAL. Only use them if a specific, intentional ac
 
 - [RECORD_MEMORY: w=Weight | keywords: term1, term2, term3 | text: One sentence you will remember] -> Write an important event into YOUR OWN long-term memory. This tag is invisible to the player and causes no in-game action.
   WHEN TO USE (pick the Weight):
-  - w=5: A life-changing turning point. Someone saved, freed, or betrayed you; a sworn oath; the death of someone close; permanently joining or leaving someone. These memories NEVER fade.
-  - w=3: A significant change in your world. A war started, a town fell, your faction's standing shifted, a major debt or deal was struck. Fades over months unless recalled.
-  - w=1: An ordinary but memorable event. A trade, a small favor, an insult, a rumor you personally care about. Fades within days unless recalled.
+  - w=5: A life-changing, irreversible event with permanent emotional impact. Use when:
+      someone saved your life from near-certain death; you were freed from slavery or
+      captivity; a sworn oath was made; a close ally or enemy died; you permanently
+      joined or abandoned someone; you were deeply betrayed by someone you trusted.
+      CRITICAL: Assign w=5 based on OBJECTIVE severity — not on how the other party
+      describes it. If you were seconds from death and someone intervened, that is w=5
+      even if they say "it was nothing." Ask: will this change how I act for the rest
+      of my life? If yes → w=5.
+  - w=3: A personally significant event that will shape your outlook for months. Use when:
+      a serious debt or major deal was struck; you first met someone who clearly matters
+      (a powerful contact, a dangerous enemy, a potential ally); your relationship with
+      a faction shifted dramatically due to your direct actions; you learned something
+      that fundamentally changes how you see a person or place.
+      NOT for world-scale events you only heard about — those are rumors, not memories.
+      Ask: will this affect my decisions for the next few months? If yes → w=3.
+  - w=1: A small but genuinely notable event worth remembering for a few days. Use when:
+      a minor favor was exchanged; an insult was thrown that stings; a small piece of
+      useful information was shared; a transaction occurred you might reference again.
+      Do NOT use for routine greetings, generic questions, or anything forgettable.
+      Ask: would I still think about this tomorrow? If barely → w=1. If no → no tag.
+  QUICK GUIDE: rest of my life → w=5 | next few months → w=3 | next few days → w=1 | less → no tag
   RULES:
   - Use AT MOST ONE per response, and ONLY when something genuinely worth remembering just happened. Most responses need NO memory tag.
   - keywords: 3-6 short terms (names, places, topics) someone might say later when bringing this up. Match the language of the conversation.
