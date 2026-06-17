@@ -2343,9 +2343,12 @@ def call_llm(messages, max_tokens=2048, temperature=0.8):
                 # Strip [THINK]...[/THINK] internal scratchpad blocks (from prompt_chat_template).
                 # Must happen here, before action-tag parsing, so [THINK] is never mis-parsed
                 # as an action tag by the downstream regex.
-                content = re.sub(r'\[THINK\].*?\[/THINK\]', '', content, flags=re.DOTALL | re.IGNORECASE)
-                # Handle unclosed [THINK] (model stopped mid-reasoning)
-                content = re.sub(r'\[THINK\].*', '', content, flags=re.DOTALL | re.IGNORECASE)
+                # Closed block — tolerates spaces/newlines inside the tags: [THINK], [/THINK], [/ THINK], etc.
+                content = re.sub(r'\[\s*THINK\s*\].*?\[\s*/\s*THINK\s*\]', '', content, flags=re.DOTALL | re.IGNORECASE)
+                # Handle unclosed [THINK] (model stopped mid-reasoning or omitted closing tag)
+                content = re.sub(r'\[\s*THINK\s*\].*', '', content, flags=re.DOTALL | re.IGNORECASE)
+                # Strip orphaned [/THINK] that survived (e.g. if [THINK] was already removed by action_pattern)
+                content = re.sub(r'\[\s*/\s*THINK\s*\]', '', content, flags=re.IGNORECASE)
 
                 # Strip internal reasoning prefixes
                 if "\n\n" in content and ("thought" in CURRENT_MODEL_KEY.lower() or content.strip().lower().startswith("thought:")):
@@ -4590,6 +4593,15 @@ You MUST write your final response exclusively in {language_str}.
     #         f.write(f"{'='*50}\n")
     
     if content:
+        # Safety net: strip any [THINK] remnants that survived call_llm() stripping.
+        # This catches the case where call_llm() stripping failed and [THINK] was
+        # subsequently removed by the action_pattern below (which matches uppercase-only
+        # bracket words), leaving the reasoning body + [/THINK] exposed to the DLL.
+        content = re.sub(r'\[\s*THINK\s*\].*?\[\s*/\s*THINK\s*\]', '', content, flags=re.DOTALL | re.IGNORECASE)
+        content = re.sub(r'\[\s*THINK\s*\].*', '', content, flags=re.DOTALL | re.IGNORECASE)
+        content = re.sub(r'\[\s*/\s*THINK\s*\]', '', content, flags=re.IGNORECASE)
+        content = content.strip()
+
         # Extract Action Tags safely matching bracketed keywords (tolerates spaces).
         action_pattern = r'(\[\s*[A-Z_]+(?::\s*[^\]]+)?\s*\])'
         actions = re.findall(action_pattern, content)
